@@ -1,0 +1,16 @@
+diff --git a/include/configs/phycore_imx8mp.h b/include/configs/phycore_imx8mp.h
+index 1e8012646c..aad6d49e50 100644
+--- a/include/configs/phycore_imx8mp.h
++++ b/include/configs/phycore_imx8mp.h
+@@ -79,7 +79,11 @@
+ 				"fi; " \
+ 			"done;" \
+ 		"fi;\0 " \
++	"enable_clkout=i2c dev 0; "\
++		"i2c mw 0x52 0x35.1 0x80 0x1;" \
++		"fi; \0" \
+ 	"mmcboot=echo Booting from mmc ...; " \
++		"run enable_clkout; " \
+ 		"run spiprobe; " \
+ 		"if test ${no_bootenv} = 0; then " \
+ 			"if run mmc_load_bootenv; then " \
