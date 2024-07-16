@@ -1,0 +1,12 @@
+diff --git a/board/phytec/phycore_am64x/phycore_am64x.env b/board/phytec/phycore_am64x/phycore_am64x.env
+index f2ba05c284..e31005ec36 100644
+--- a/board/phytec/phycore_am64x/phycore_am64x.env
++++ b/board/phytec/phycore_am64x/phycore_am64x.env
+@@ -1,6 +1,7 @@
+ #include <environment/ti/ti_armv7_common.env>
+ #include <environment/phytec/rauc.env>
+ 
++customVar=customVal
+ name_kern=Image
+ console=ttyS2,115200n8
+ fdtfile=CONFIG_DEFAULT_FDT_FILE
