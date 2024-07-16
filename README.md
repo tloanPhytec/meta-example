@@ -5,15 +5,20 @@ Reference for adding custom boot environment variables to PHYTEC's phyCORE-AM64x
 
 With Yocto's build environment sourced:
 
-  // Host Console
-  cd $BUILDDIR/../sources
-  git clone https://github.com/tloanPhytec/meta-example.git -b am64-kirkstone-bootenv
-  cd $BUILDDIR
-  bitbake-layers add-layer ../sources/meta-example
+    // Host Console
+  
+    cd $BUILDDIR/../sources
+  
+    git clone https://github.com/tloanPhytec/meta-example.git -b am64-kirkstone-bootenv
+  
+    cd $BUILDDIR
+  
+    bitbake-layers add-layer ../sources/meta-example
 
-  bitbake phytec-headless-image
+    bitbake phytec-headless-image
 
 You will see a new dummy variable upon booting into U-Boot:
 
-  // U-boot console
-  printenv customVar
+    // U-boot console
+  
+    printenv customVar
