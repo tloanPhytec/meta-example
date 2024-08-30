@@ -1,25 +1,3 @@
-# meta-example
-branch = 
-
-
-
-With Yocto's build environment sourced:
-
-    // Host Console
-  
-    cd $BUILDDIR/../sources
-  
-    git clone https://github.com/tloanPhytec/meta-example.git -b 
-  
-    cd $BUILDDIR
-  
-    bitbake-layers add-layer ../sources/meta-example
-
-    bitbake phytec-headless-image
-
-
-
-
 # Branch am64-kirkstone-bootenv
 
 This branch serves as a reference for adding custom boot environment variables to PHYTEC's phyCORE-AM64x BSP.
