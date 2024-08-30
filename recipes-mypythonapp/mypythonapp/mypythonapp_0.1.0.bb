@@ -1,5 +1,5 @@
 SUMMARY = "Example Recipe For Installing a File"
-DESCRIPTION = "Installs a python2 script to the rootfs"
+DESCRIPTION = "Installs a python3 script to the rootfs"
 LICENSE = "CLOSED"
 LIC_FILES_CHKSUM=""
 
