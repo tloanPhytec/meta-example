@@ -1,0 +1,13 @@
+diff --git a/board/phytec/phycore_am62x/phycore_am62x.env b/board/phytec/phycore_am62x/phycore_am62x.env
+index ed5ea811f6..dafc2f7cae 100644
+--- a/board/phytec/phycore_am62x/phycore_am62x.env
++++ b/board/phytec/phycore_am62x/phycore_am62x.env
+@@ -5,7 +5,7 @@
+ name_kern=Image
+ console=ttyS2,115200n8
+ fdtfile=CONFIG_DEFAULT_FDT_FILE
+-args_all=setenv optargs ${optargs} earlycon=ns16550a,mmio32,0x02800000
++args_all=mw 0x000F4034 0x00010007; gpio set gpio@600000_13; sleep 5; gpio clear gpio@600000_13; sleep 5; setenv optargs ${optargs} earlycon=ns16550a,mmio32,0x02800000
+ run_kern=booti ${loadaddr} ${rd_spec} ${fdtaddr}
+ 
+ boot=mmc
