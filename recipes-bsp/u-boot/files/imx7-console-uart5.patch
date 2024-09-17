@@ -1,0 +1,24 @@
+diff --git a/include/configs/phycore_imx7.h b/include/configs/phycore_imx7.h
+index 2d2c26806a8..33f10b829ca 100644
+--- a/include/configs/phycore_imx7.h
++++ b/include/configs/phycore_imx7.h
+@@ -7,7 +7,9 @@
+ #include "mx7_common.h"
+ #include "imx7_spl.h"
+ 
+-#define CONFIG_MXC_UART_BASE		UART1_IPS_BASE_ADDR
++#define CONFIG_MXC_UART_BASE		UART5_IPS_BASE_ADDR
++#define CONFIG_CONS_INDEX                      5
++
+ 
+ /* Size of malloc() pool */
+ #define CONFIG_SYS_MALLOC_LEN		(32 * SZ_1M)
+@@ -93,7 +95,7 @@
+ 	UPDATE_M4_ENV \
+ 	"script=boot.scr\0" \
+ 	"image=zImage\0" \
+-	"console=ttymxc0\0" \
++	"console=ttymxc4\0" \
+ 	"fdt_high=0xffffffff\0" \
+ 	"initrd_high=0xffffffff\0" \
+ 	"fdt_file=imx7d-phyboard-zeta-kit.dtb\0" \
