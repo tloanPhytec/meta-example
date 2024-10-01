@@ -1,7 +1,7 @@
 # Branch am62-kirkstone-customMachine
 
 This branch serves as a reference for creating a custom MACHINE that inherits PHYTEC's phyCORE-AM62x Development Kit config (MACHINE=phyboard-lyra-am62xx-3) and can serve as a basis for further customizing a custom MACHINE seperately from PHYTEC's.
-This was tested with the phyCORE-AM62x's BSP-Yocto-AM57x-PD23.2.1
+This was tested with the phyCORE-AM62x BSP version PD23.2.1
 
 In order to evaluate this in your phyCORE-AM62x BSP setup:
 
