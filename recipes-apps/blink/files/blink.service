@@ -1,0 +1,15 @@
+[Unit]
+Description=Blink Service
+After=basic.target
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/blink
+ExecStopPost=/usr/bin/pkill blink
+RemainAfterExit=no
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
