@@ -24,7 +24,8 @@ git clone https://github.com/tloanPhytec/meta-example.git -b am64-scarthgap-linu
 Enable the layer in your build:
 
 ```sh
-cd $BUILDDIR bitbake-layers add-layer ../sources/meta-example
+cd $BUILDDIR
+bitbake-layers add-layer ../sources/meta-example
 ```
 
 Open your BSP's local build configuration:
