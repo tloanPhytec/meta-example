@@ -21,7 +21,8 @@ git clone https://github.com/tloanPhytec/meta-example.git -b 8mp-kirkstone-boote
 Enable the layer in your build: 
 
 ```sh
-cd $BUILDDIR bitbake-layers add-layer ../sources/meta-example
+cd $BUILDDIR
+bitbake-layers add-layer ../sources/meta-example
 ```
 
 Rebuild your target's image with bitbake
