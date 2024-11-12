@@ -1,4 +1,4 @@
-COMPATIBLE_MACHINE = "phyboard-electra-am64xx-2"
+COMPATIBLE_MACHINE = "phyboard-lyra-am62xx-3"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
