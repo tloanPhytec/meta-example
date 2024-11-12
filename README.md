@@ -1,6 +1,6 @@
-# Branch am64-scarthgap-kernelCfgFrag
+# Branch am62-scarthgap-kernelCfgFrag
 
-This branch serves as a reference for customizing the Linux Kernel Configuration via kernel config fragments, targeting PHYTEC's phyCORE-AM64x BSP.
+This branch serves as a reference for customizing the Linux Kernel Configuration via kernel config fragments, targeting PHYTEC's phyCORE-AM62x BSP.
 
 The kernel config fragment can be generated with:
 
@@ -12,12 +12,11 @@ bitbake linux-phytec-ti -c menuconfig
 bitbake linux-phytec-ti -c diffconfig
 ```
 
-In this case, CONFIG_INPUT_JOYDEV is enabled as a kernel Module. 
-CONFIG_INPUT_JOYDEV enables the support required for a joystick or gamepad to be accessible as char device ( /dev/input/jsX ).
+In this case, CONFIG_THERMAL_GOV_BANG_BANG and CONFIG_THERMAL_DEFAULT_GOV_BANG_BANG are enabled directly into the kernel. CONFIG_THERMAL_GOV_BANG_BANG and CONFIG_THERMAL_DEFAULT_GOV_BANG_BANG enable the bang bang govener. Enabling the bang-bang thermal governor for GPIO-based fans provides smoother control by leveraging the hysteresis value. This prevents abrupt on/off switching, allowing fans to operate more efficiently. The bang-bang governor uses hysteresis to manage fan state transitions, particularly useful for fans that only support binary on/off operation rather than variable throttling.
 
-This was tested with BSP-Yocto-Ampliphy-AM64x-PD24.1.0
+This was tested with BSP-Yocto-Ampliphy-AM62x-PD24.1.0
 
-In order to evaluate this on your phyCORE-AM64x Development Kit:
+In order to evaluate this on your phyCORE-AM62x Development Kit:
 
 Navigate to your BSP's sources directory: 
 
@@ -28,7 +27,7 @@ cd $BUILDDIR/../sources
 clone this repo and branch: 
 
 ```sh
-git clone https://github.com/tloanPhytec/meta-example.git -b am64-scarthgap-kernelCfgFrag
+git clone https://github.com/tloanPhytec/meta-example.git -b am62-scarthgap-kernelCfgFrag
 ```
 
 Enable the layer in your build:
