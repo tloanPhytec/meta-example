@@ -12,7 +12,7 @@ bitbake linux-phytec-ti -c menuconfig
 bitbake linux-phytec-ti -c diffconfig
 ```
 
-In this case, CONFIG_THERMAL_GOV_BANG_BANG and CONFIG_THERMAL_DEFAULT_GOV_BANG_BANG are enabled directly into the kernel. CONFIG_THERMAL_GOV_BANG_BANG and CONFIG_THERMAL_DEFAULT_GOV_BANG_BANG enable the bang bang govener. Enabling the bang-bang thermal governor for GPIO-based fans provides smoother control by leveraging the hysteresis value. This prevents abrupt on/off switching, allowing fans to operate more efficiently. The bang-bang governor uses hysteresis to manage fan state transitions, particularly useful for fans that only support binary on/off operation rather than variable throttling.
+In this case, CONFIG_THERMAL_GOV_BANG_BANG is enabled directly into the kernel. CONFIG_THERMAL_GOV_BANG_BANG enables the bang bang govener. Enabling the bang-bang thermal governor for GPIO-based fans provides smoother control by leveraging the hysteresis value. This prevents abrupt on/off switching, allowing fans to operate more efficiently. The bang-bang governor uses hysteresis to manage fan state transitions, particularly useful for fans that only support binary on/off operation rather than variable throttling.
 
 This was tested with BSP-Yocto-Ampliphy-AM62x-PD24.1.0
 
