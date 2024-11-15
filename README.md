@@ -1,6 +1,6 @@
 # Branch imx93-scarthgap-carrierboard1616.0
 
-BSP-Yocto-NXP-i.MX93-PD24.2.0 effectively deprecated the phyCORE-i.MX93 Deveopment Kit carrier board revision 1616.0 (specifcally, the PEB-AV-10 LCD Display Add-On will no longer work with th 1616.0 carrier board by default, but other interfaces should work). This can be seen in the following note from the release notes: 
+BSP-Yocto-NXP-i.MX93-PD24.2.0 effectively deprecated the phyCORE-i.MX93 Deveopment Kit carrier board revision 1616.0 (specifcally, the PEB-AV-10 LCD Display Add-On will no longer work with the 1616.0 carrier board by default, but other interfaces should work). This can be seen in the following note from the release notes: 
   
   https://download.phytec.de/Software/Linux/BSP-Yocto-i.MX93/BSP-Yocto-NXP-i.MX93-PD24.2.0/ReleaseNotes
 
