@@ -12,7 +12,9 @@ BSP-Yocto-NXP-i.MX93-PD24.2.0 effectively deprecated the phyCORE-i.MX93 Deveopme
 
   This branch of meta-example re-enables 1616.0 support by setting up a new MACHINE=phyboard-nash-imx93-0 and patches the kernel appropriately so that the LCD display Add-On properly functions with that older carrier board.
 
+
   MACHINE=phyboard-nash-imx93-0 = Carrier Board PCB# 1616.0
+  
   MACHINE=phyboard-nash-imx93-1 = Carrier Board PCB# 1616.1
   
 **This was tested with BSP-Yocto-NXP-i.MX93-PD24.2.0**
