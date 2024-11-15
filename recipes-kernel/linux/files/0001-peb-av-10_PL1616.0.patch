@@ -1,0 +1,13 @@
+diff --git a/arch/arm64/boot/dts/freescale/imx93-phyboard-nash-peb-av-10.dtso b/arch/arm64/boot/dts/freescale/imx93-phyboard-nash-peb-av-10.dtso
+index caf84c3a3d51..e97cd7879cff 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-phyboard-nash-peb-av-10.dtso
++++ b/arch/arm64/boot/dts/freescale/imx93-phyboard-nash-peb-av-10.dtso
+@@ -22,7 +22,7 @@ backlight: backlight {
+ 		pinctrl-0 = <&pinctrl_backlight>;
+ 		brightness-levels= <0 4 8 16 32 64 128 255>;
+ 		default-brightness-level = <6>;
+-		enable-gpios = <&gpio2 7 GPIO_ACTIVE_LOW>;
++		enable-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
+ 		power-supply = <&reg_vcc_3v3>;
+ 		pwms = <&tpm5 2 50000 0>;
+ 	};
