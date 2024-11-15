@@ -11,6 +11,9 @@ BSP-Yocto-NXP-i.MX93-PD24.2.0 effectively deprecated the phyCORE-i.MX93 Deveopme
       logic again to active-low to get backlight working.
 
   This branch of meta-example re-enables 1616.0 support by setting up a new MACHINE=phyboard-nash-imx93-0 and patches the kernel appropriately so that the LCD display Add-On properly functions with that older carrier board.
+
+  MACHINE=phyboard-nash-imx93-0 = Carrier Board PCB# 1616.0
+  MACHINE=phyboard-nash-imx93-1 = Carrier Board PCB# 1616.1
   
 **This was tested with BSP-Yocto-NXP-i.MX93-PD24.2.0**
 
@@ -38,5 +41,5 @@ bitbake-layers add-layer ../sources/meta-example
 Rebuild your target's image with bitbake. Be sure to enable the new custom MACHINE, either on the cmd line or in your $BUILDDIR/conf/local.conf:
 
 ```sh
-MACHINE=phyboard-nash-imx93-0-custom bitbake phytec-qt6demo-image
+MACHINE=phyboard-nash-imx93-0 bitbake phytec-qt6demo-image
 ```
