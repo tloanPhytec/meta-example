@@ -1,0 +1,1 @@
+RAUC_KEYRING_FILE = "${CERT_PATH}/cert.pem"
