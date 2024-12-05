@@ -1,3 +1,3 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
-SRC_URI += "file://weston_LVDS_active.patch"
+SRC_URI += "file://weston.ini"
