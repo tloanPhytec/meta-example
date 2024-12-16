@@ -1,9 +1,10 @@
-# Branch 8mp-scarthgap-westonConfig
+# Branch 8mp-scarthgap-kivydemo
 
-This branch serves as a reference for changing the default graphics configuration of PHYTEC's phyCORE-i.MX8M Plus BSP. Enabling this layer in your BSP will have the following effects:
+This branch serves as a reference for creating a custom image featuring a Kivy demo in PHYTEC's phyCORE-i.MX8M Plus BSP. Enabling this layer in your BSP will have the following effects:
 
+- introduces a new phytec-kivydemo-image recipe that largely copies phytec-qt6demo-image
+- phytec-kivydemo-image removes the qt6 demo/support and adds python3-kivy demo/support instead.
 - moves the active weston display from HDMI to the LVDS0 interface
-- disables the Qt6 demo's systemd service such that it will no longer star automatically upon boot
 
 This was tested with the phyCORE-i.MX8M Plus's BSP PD24.1.0
 
@@ -18,7 +19,7 @@ cd $BUILDDIR/../sources
 clone this repo and branch: 
 
 ```sh
-git clone https://github.com/tloanPhytec/meta-example.git -b 8mp-scarthgap-westonConfig
+git clone https://github.com/tloanPhytec/meta-example.git -b  8mp-scarthgap-kivydemo
 ```
 
 Enable the layer in your build: 
@@ -30,3 +31,6 @@ bitbake-layers add-layer ../sources/meta-example
 
 Rebuild your target's image with bitbake
 
+```sh
+bitbake phytec-kivydemo-image
+```
