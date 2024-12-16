@@ -8,6 +8,8 @@ This branch serves as a reference for creating a custom image featuring a Kivy d
 
 This was tested with the phyCORE-i.MX8M Plus's BSP PD24.1.0
 
+This meta-example reference was taken largely from https://github.com/phytec/meta-kivy-phytec.git and was added here in an effort to consolidate examples in one place. Checkout out the original project for updates and un-clobbered commits.
+
 In order to evaluate this on your phyCORE-i.MX8M Plus Development Kit:
 
 Navigate to your BSP's sources directory: 
