@@ -3,7 +3,7 @@
 This branch serves as a reference for changing the default graphics configuration of PHYTEC's phyCORE-i.MX8M Plus BSP. Enabling this layer in your BSP will have the following effects:
 
 - moves the active weston display from HDMI to the LVDS0 interface
-- disables the Qt6 demo's systemd service such that it will no longer star automatically upon boot
+- disables the Qt6 demo's systemd service such that it will no longer start automatically upon boot
 
 This was tested with the phyCORE-i.MX8M Plus's BSP PD24.1.0
 
