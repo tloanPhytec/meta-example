@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define LED_PATH "/sys/class/leds/blue:user/brightness"
+#define LED_PATH "/sys/class/leds/led-1/brightness"
 #define DELAY 500000  // 500 milliseconds (half a second)
 
 void set_led_brightness(int value) {

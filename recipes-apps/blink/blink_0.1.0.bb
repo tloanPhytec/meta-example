@@ -34,6 +34,6 @@ do_install() {
 
 RDEPENDS:${PN} += "bash"
 
-COMPATIBLE_MACHINE:phyboard-electra-am64xx-2 = "phyboard-electra-am64xx-2"
+COMPATIBLE_MACHINE .= "|phyboard-lyra-am62xx-3"
 
 INSANE_SKIP:${PN}-dbg += "buildpaths"
