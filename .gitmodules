@@ -1,0 +1,3 @@
+[submodule "meta-flutter"]
+	path = meta-flutter
+	url = https://github.com/meta-flutter/meta-flutter.git
