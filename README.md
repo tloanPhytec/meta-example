@@ -16,17 +16,21 @@ Navigate to your BSP's sources directory:
 cd $BUILDDIR/../sources
 ```
 
-clone this repo and branch: 
+Clone this repo and branch: 
 
 ```sh
 git clone https://github.com/tloanPhytec/meta-example.git -b  8mp-scarthgap-flutterdemo
+cd meta-example
+git submodule update --init
 ```
 
-Enable the layer in your build: 
+Enable the layer and it's submodule meta-layers in your build: 
 
 ```sh
 cd $BUILDDIR
 bitbake-layers add-layer ../sources/meta-example
+bitbake-layers add-layer ../sources/meta-example/meta-flutter
+bitbake-layers add-layer ../sources/meta-example/meta-flutter/meta-flutter-apps
 ```
 
 Build the new flutter demo image with bitbake
