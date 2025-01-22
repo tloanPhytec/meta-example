@@ -1,9 +1,9 @@
-# Branch 8mp-scarthgap-westonConfig
+# Branch 8mp-scarthgap-psplash
 
-This branch serves as a reference for changing the default graphics configuration of PHYTEC's phyCORE-i.MX8M Plus BSP. Enabling this layer in your BSP will have the following effects:
+This branch serves as a reference for changing the default splash screen of PHYTEC's phyCORE-i.MX8M Plus BSP's phytec-qt6demo-image. Enabling this layer in your BSP will have the following effects:
 
 - moves the active weston display from HDMI to the LVDS0 interface
-- disables the Qt6 demo's systemd service such that it will no longer start automatically upon boot
+- updates the splash screen with a custom logo
 
 This was tested with the phyCORE-i.MX8M Plus's BSP PD24.1.0
 
@@ -18,7 +18,7 @@ cd $BUILDDIR/../sources
 clone this repo and branch: 
 
 ```sh
-git clone https://github.com/tloanPhytec/meta-example.git -b 8mp-scarthgap-westonConfig
+git clone https://github.com/tloanPhytec/meta-example.git -b 8mp-scarthgap-psplash
 ```
 
 Enable the layer in your build: 
