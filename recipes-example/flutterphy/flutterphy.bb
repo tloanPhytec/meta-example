@@ -9,6 +9,7 @@ DEPENDS += " flutter-wayland-client flutter-samples-material-3-demo wayland libx
 
 SRC_URI = " \
     file://flutter-demo.service \
+    file://flutterphy.env \
 "
 
 inherit systemd
@@ -19,4 +20,5 @@ FILES:${PN} += "${systemd_unitdir}"
 
 do_install:append() {
     install -Dm 0644 ${WORKDIR}/flutter-demo.service ${D}${systemd_system_unitdir}/flutter-demo.service
+    install -Dm 0644 ${WORKDIR}/flutterphy.env ${D}${sysconfdir}/default/flutterphy
 }
