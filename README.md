@@ -4,6 +4,7 @@ This branch serves as a reference for changing the default splash screen of PHYT
 
 - moves the active weston display from HDMI to the LVDS0 interface
 - updates the splash screen with a custom logo
+- disables the Tux the Penguin Linux Logo via kernel config fragment
 
 This was tested with the phyCORE-i.MX8M Plus's BSP PD24.1.0
 
