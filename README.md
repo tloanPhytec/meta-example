@@ -18,11 +18,13 @@ Clone this repo and branch:
 git clone https://github.com/tloanPhytec/meta-example.git -b am62-scarthgap-chromium
 ```
 
-Enable the layer in your build:
+Enable the layer and its sub-layers (this meta-example branch depends on meta-browser and meta-clang, both are set up as git submodules in this meta-example branch):
 
 ```sh
 cd $BUILDDIR
 bitbake-layers add-layer ../sources/meta-example
+bitbake-layers add-layer ../sources/meta-example/meta-clang
+bitbake-layers add-layer ../sources/meta-example/meta-browser/meta-chromium
 ```
 
 Open your BSP's local build configuration:
