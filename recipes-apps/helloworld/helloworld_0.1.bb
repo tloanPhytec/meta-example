@@ -8,16 +8,14 @@ SRC_URI += " \
 	file://hello.c \
 "
 do_compile() {
-         ${CC} ${CFLAGS} ${LDFLAGS} ${WORKDIR}/hello.c -o ${WORKDIR}/hello
+         ${CC} ${CFLAGS} ${LDFLAGS} ${WORKDIR}/hello.c -o ${WORKDIR}/hello-world
 }
 
 do_install() {
 	install -d ${D}/${bindir}
-	install -m 0755 ${WORKDIR}/hello ${D}/${bindir}/hello
+	install -m 0755 ${WORKDIR}/hello-world ${D}/${bindir}/hello-world
 }
 
 FILES:${PN} += " \
-	${bindir}/hello \
+	${bindir}/hello-world \
 "
-
-INSANE_SKIP:${PN}-dbg += "buildpaths"
