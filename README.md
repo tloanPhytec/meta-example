@@ -27,7 +27,7 @@ bitbake-layers add-layer ../sources/meta-example
 Rebuild your target's image with bitbake
 
 ```sh
-bitbake
+bitbake phytec-headless-image
 ```
 
 Verify Watchdog & ESM configs were disabled
