@@ -1,7 +1,6 @@
 # Branch am64-scarthgap-disableWatchdog
 
-This branch serves as a reference for completly disabling Watchdog and ESM configs on PHYTEC's phyCORE-AM64x BSP.
-This was tested with the phyCORE-AM64x's BSP PD24.1.1. 
+This branch serves as a reference for completely disabling the Watchdog interface in both U-Boot and the kernel, as well as disabling the CONFIG_ESM_K3 driver in U-Boot on PHYTEC's phyCORE-AM64x BSP. Disabling the ESM driver prevents the system from resetting when the Watchdog is triggered. This configuration was tested with the phyCORE-AM64x BSP PD24.1.1.
 
 In order to evaluate this on your phyCORE-AM64x Development Kit:
 
