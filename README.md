@@ -1,6 +1,6 @@
 # Branch am64-scarthgap-disESM-R5
 
-This branch serves as a reference for disabling the CONFIG_ESM_K3 driver in U-Boot on PHYTEC's phyCORE-AM64x BSP.
+This branch serves as a reference for disabling the CONFIG_ESM_K3 driver in U-Boot on PHYTEC's phyCORE-AM64x BSP. Disabling the ESM driver prevents the system from resetting when the Watchdog is triggered.
 This was tested with the phyCORE-AM64x's BSP PD24.1.1. 
 
 In order to evaluate this on your phyCORE-AM64x Development Kit:
