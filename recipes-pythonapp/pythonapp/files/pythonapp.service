@@ -1,0 +1,15 @@
+[Unit]
+Description=Python HelloWorld Service
+After=basic.target
+
+[Service]
+User=root
+Type=simple
+ExecStart=/usr/bin/python3 -u /opt/pythonapp/pythonapp.py
+ExecStop=/usr/bin/kill $MAINPID
+RemainAfterExit=no
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
