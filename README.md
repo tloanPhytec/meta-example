@@ -51,3 +51,11 @@ It can be stopped and started with the following:
 systemctl stop pythonapp.service
 systemctl start pythonapp.service
 ```
+
+The service autostart may also be enabled and disabled:
+
+```sh
+systemctl enable pythonapp.service
+systemctl disable pythonapp.service
+```
+
