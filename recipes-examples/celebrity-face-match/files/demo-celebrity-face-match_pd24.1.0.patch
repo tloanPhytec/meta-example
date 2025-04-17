@@ -1,0 +1,15 @@
+diff --git a/aidemo.py b/aidemo.py
+index f2bb131..0e35ee7 100644
+--- a/aidemo.py
++++ b/aidemo.py
+@@ -150,10 +150,6 @@ class AiDemo(Gtk.Window):
+ 
+         self.loadscreen = LoadScreen()
+         self.loadscreen.connect('delete-event', Gtk.main_quit)
+-        if FULLSCREEN:
+-            self.fullscreen()
+-        else:
+-            self.maximize()
+ 
+     def setup_layout(self):
+         self.main_label.set_markup(
