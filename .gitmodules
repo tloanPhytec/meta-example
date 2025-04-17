@@ -1,0 +1,3 @@
+[submodule "meta-celebrity-face-match"]
+	path = meta-celebrity-face-match
+	url = https://github.com/phytec/meta-celebrity-face-match.git
