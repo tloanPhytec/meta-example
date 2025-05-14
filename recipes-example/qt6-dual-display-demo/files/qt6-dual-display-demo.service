@@ -1,0 +1,17 @@
+[Unit]
+Description=Qt6 Dual-Display Demo Service
+After=basic.target
+
+[Service]
+Environment="XDG_RUNTIME_DIR=/run/user/0"
+Environment="WAYLAND_DISPLAY=/run/wayland-0"
+User=weston
+Type=simple
+ExecStart=/usr/bin/qt6-dual-display-demo
+ExecStop=/usr/bin/kill $MAINPID
+RemainAfterExit=no
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
