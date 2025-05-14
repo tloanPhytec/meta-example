@@ -1,9 +1,10 @@
-# Branch 8mp-scarthgap-westonConfig
+# Branch 8mp-scarthgap-Qt6DualDisplay
 
 This branch serves as a reference for changing the default graphics configuration of PHYTEC's phyCORE-i.MX8M Plus BSP. Enabling this layer in your BSP will have the following effects:
 
-- moves the active weston display from HDMI to the LVDS0 interface
+- Enables BOTH the PEB-AV-10 LVDS display accessory and the HDMI interface within the Weston configuration
 - disables the Qt6 demo's systemd service such that it will no longer start automatically upon boot
+- introduces a new recipe qt6-dual-display-demo (builds a Qt6 dual-display demo from source, and enables it as a systemd service)
 
 This was tested with the phyCORE-i.MX8M Plus's BSP PD24.1.0
 
@@ -18,7 +19,7 @@ cd $BUILDDIR/../sources
 clone this repo and branch: 
 
 ```sh
-git clone https://github.com/tloanPhytec/meta-example.git -b 8mp-scarthgap-westonConfig
+git clone https://github.com/tloanPhytec/meta-example.git -b 8mp-scarthgap-Qt6DualDisplay
 ```
 
 Enable the layer in your build: 
@@ -28,5 +29,10 @@ cd $BUILDDIR
 bitbake-layers add-layer ../sources/meta-example
 ```
 
-Rebuild your target's image with bitbake
+Rebuild your target's Qt6 image with bitbake
 
+```sh
+bitbake phytec-qt6demo-image
+```
+
+Use the resulting image to boot your phyCORE-i.MX8M Plus Development Kit with it connected to the PEB-AV-10 LVDS Display Add-On and a HDMI monitor. The dual display demo will start automatically. 
