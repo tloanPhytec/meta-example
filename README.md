@@ -24,4 +24,4 @@ bitbake-layers add-layer ../sources/meta-example
 
 Rebuild your target's image with bitbake. 
 
-Now, when you boot a system based on this image, you will be prompted to log in manually by typing root at the login prompt.
+Now, when you boot a system based on this image, you will be prompted to log in manually by typing "root" at the login prompt.
