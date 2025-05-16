@@ -1,2 +1,0 @@
-[Service]
-ExecStart=-/sbin/agetty -8 -L --keep-baud %I 115200 $TERM
