@@ -11,7 +11,7 @@ inherit extrausers
 #PASSWD_PHY= america
 PASSWD_BI = "\$1\$LqdHX70M\$d1yLxhBiyI0ZKeVZD/RAV1"
 PASSWD_PHY = "\$1\$1oeLMdHV\$dE5g8tCmARXnzjRJ2cres/"
-#INHERIT += "extrausers"
+
 
 #bainbridge is restricted, phytec has root access
 EXTRA_USERS_PARAMS = "\
