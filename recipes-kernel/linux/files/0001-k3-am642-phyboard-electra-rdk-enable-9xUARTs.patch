@@ -1,0 +1,207 @@
+From a439799c8420de7b63085bd315bc2c62f3d88378 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Wed, 18 Jun 2025 16:03:55 +0000
+Subject: [PATCH] k3-am642-phyboard-electra-rdk.dts: enable maximum 9x UART
+ serial interfaces
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ .../dts/ti/k3-am642-phyboard-electra-rdk.dts  | 138 ++++++++++++------
+ 1 file changed, 94 insertions(+), 44 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-rdk.dts b/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-rdk.dts
+index bc8e1ce11047..2fc266828d32 100644
+--- a/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-rdk.dts
++++ b/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-rdk.dts
+@@ -31,23 +31,21 @@ aliases {
+ 		ethernet1 = &icssg0_emac0;
+ 		ethernet2 = &icssg0_emac1;
+ 		mmc1 = &sdhci1;
++		serial0 = &mcu_uart0;
++		serial1 = &mcu_uart1;
+ 		serial2 = &main_uart0;
+ 		serial3 = &main_uart1;
++		serial4 = &main_uart2;
++		serial5 = &main_uart3;
++		serial6 = &main_uart4;
++		serial7 = &main_uart5;
++		serial8 = &main_uart6;	
+ 	};
+ 
+ 	chosen {
+ 		stdout-path = &main_uart0;
+ 	};
+ 
+-	can_tc1: can-phy0 {
+-		compatible = "ti,tcan1042";
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&can_tc1_pins_default>;
+-		#phy-cells = <0>;
+-		max-bitrate = <8000000>;
+-		standby-gpios = <&main_gpio0 32 GPIO_ACTIVE_HIGH>;
+-	};
+-
+ 	can_tc2: can-phy1 {
+ 		compatible = "ti,tcan1042";
+ 		pinctrl-names = "default";
+@@ -124,25 +122,6 @@ icssg0_emac1: port@1 {
+ 		};
+ 	};
+ 
+-	keys {
+-		compatible = "gpio-keys";
+-		autorepeat;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&gpio_keys_pins_default>;
+-
+-		key-home {
+-			label = "home";
+-			linux,code = <KEY_HOME>;
+-			gpios = <&main_gpio0 17 GPIO_ACTIVE_HIGH>;
+-		};
+-
+-		key-menu {
+-			label = "menu";
+-			linux,code = <KEY_MENU>;
+-			gpios = <&main_gpio0 21 GPIO_ACTIVE_HIGH>;
+-		};
+-	};
+-
+ 	leds {
+ 		compatible = "gpio-leds";
+ 		pinctrl-names = "default";
+@@ -174,12 +153,53 @@ vcc_3v3_mmc: regulator-sd {
+ 	};
+ };
+ 
++&mcu_pmx0 {
++	mcuuart0_pins_default: mcuuart0-default-pins {
++		pinctrl-single,pins = <
++			AM64X_MCU_IOPAD(0x0028, PIN_INPUT, 0) /* (A9) MCU_UART0_RXD */
++			AM64X_MCU_IOPAD(0x002c, PIN_OUTPUT, 0) /* (A8) MCU_UART0_TXD */
++		>;
++	};
++
++	mcuuart1_pins_default: mcuuart1-default-pins {
++		pinctrl-single,pins = <
++			AM64X_MCU_IOPAD(0x0038, PIN_INPUT, 0) /* (C9) MCU_UART1_RXD */
++			AM64X_MCU_IOPAD(0x003c, PIN_OUTPUT, 0) /* (D9) MCU_UART1_TXD */
++		>;
++	};
++};
++
+ &main_pmx0 {
+-	can_tc1_pins_default: can-tc1-default-pins {
++	mainuart2_pins_default: mainuart2-default-pins {
+ 		pinctrl-single,pins = <
+-			AM64X_IOPAD(0x0084, PIN_OUTPUT, 7)	/* (P16) GPMC0_ADVn_ALE.GPIO0_32 */
++			AM64X_IOPAD(0x0238, PIN_INPUT, 3) /* (B16) UART0_CTSn.UART2_RXD */
++			AM64X_IOPAD(0x023c, PIN_OUTPUT_PULLUP, 3) /* (A16) UART0_RTSn.UART2_TXD */
+ 		>;
+ 	};
++	mainuart3_pins_default: mainuart3-default-pins {
++		pinctrl-single,pins = <
++			AM64X_IOPAD(0x0048, PIN_INPUT, 2) /* (U20) GPMC0_AD3.UART3_RXD */
++			AM64X_IOPAD(0x004C, PIN_OUTPUT_PULLUP, 2) /* (U18) GPMC0_AD4.UART3_TXD */
++		>;
++	};
++	mainuart4_pins_default: mainuart4-default-pins {
++		pinctrl-single,pins = <
++			AM64X_IOPAD(0x0054, PIN_INPUT, 2) /* (V20) GPMC0_AD6.UART4_RXD */
++			AM64X_IOPAD(0x0058, PIN_OUTPUT_PULLUP, 2) /* (V21) GPMC0_AD7.UART4_TXD */
++		>;
++	};
++	mainuart5_pins_default: mainuart5-default-pins {
++		pinctrl-single,pins = <
++			AM64X_IOPAD(0x0084, PIN_INPUT, 2) /* (P16) GPMC0_ADVn_ALE.UART5_RXD */
++			AM64X_IOPAD(0x029C, PIN_OUTPUT_PULLUP, 3) /* (C20) MMC1_SDWP.UART5_TXD */
++		>;
++	};
++	mainuart6_pins_default: mainuart6-default-pins {
++		pinctrl-single,pins = <
++			AM64X_IOPAD(0x0074, PIN_INPUT, 2) /* (Y21) GPMC0_AD14.UART6_RXD */
++			AM64X_IOPAD(0x0078, PIN_OUTPUT_PULLUP, 2) /* (Y20) GPMC0_AD15.UART6_TXD */
++		>;
++	};	
+ 
+ 	can_tc2_pins_default: can-tc2-default-pins {
+ 		pinctrl-single,pins = <
+@@ -193,13 +213,6 @@ AM64X_IOPAD(0x0274, PIN_OUTPUT, 5)	/* (A19) EXT_REFCLK1.CLKOUT0 */
+ 		>;
+ 	};
+ 
+-	gpio_keys_pins_default: gpio-keys-default-pins {
+-		pinctrl-single,pins = <
+-			AM64X_IOPAD(0x0044, PIN_INPUT, 7)	/* (T18) GPMC0_AD2.GPIO0_17 */
+-			AM64X_IOPAD(0x0054, PIN_INPUT, 7)	/* (V20) GPMC0_AD6.GPIO0_21 */
+-		>;
+-	};
+-
+ 	icssg0_mdio_pins_default: icssg0-mdio-default-pins {
+ 		pinctrl-single,pins = <
+ 			AM64X_IOPAD(0x0200, PIN_INPUT, 0)	/* (P2) PRG0_MDIO0_MDIO */
+@@ -381,13 +394,6 @@ led-5 {
+ 	};
+ };
+ 
+-&main_mcan0 {
+-	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_mcan0_pins_default>;
+-	phys = <&can_tc1>;
+-};
+-
+ &main_mcan1 {
+ 	status = "okay";
+ 	pinctrl-names = "default";
+@@ -457,3 +463,47 @@ &usb0 {
+ 	phys = <&serdes0_pcie_usb_link>;
+ 	phy-names = "cdns3,usb3-phy";
+ };
++
++&mcu_uart0 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mcuuart0_pins_default>;
++	/delete-property/ clock-frequency;
++};
++
++&mcu_uart1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mcuuart1_pins_default>;
++	/delete-property/ clock-frequency;
++};
++
++&main_uart2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mainuart2_pins_default>;
++};
++
++&main_uart3 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mainuart3_pins_default>;
++};
++
++&main_uart4 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mainuart4_pins_default>;
++};
++
++&main_uart5 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mainuart5_pins_default>;
++};
++
++&main_uart6 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mainuart6_pins_default>;
++};
+-- 
+2.25.1
+
