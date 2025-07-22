@@ -1,0 +1,55 @@
+From 6966556c18fe6a4cd1ba63c4030aa637a7c5ad9c Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 22 Jul 2025 17:27:36 +0000
+Subject: [PATCH] arm64: dts: ti: k3-am642-phyboard-electra-peb-c-010.dtso: Fix
+ DT overlay
+
+- Deleted unsupported property
+- Defined PHY's Reset GPIO
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ .../boot/dts/ti/k3-am642-phyboard-electra-peb-c-010.dtso    | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-peb-c-010.dtso b/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-peb-c-010.dtso
+index 1dc912bf5bbe..ae6fa4f82937 100644
+--- a/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-peb-c-010.dtso
++++ b/arch/arm64/boot/dts/ti/k3-am642-phyboard-electra-peb-c-010.dtso
+@@ -7,6 +7,7 @@
+ /dts-v1/;
+ /plugin/;
+ 
++#include <dt-bindings/gpio/gpio.h>
+ #include <dt-bindings/net/ti-dp83869.h>
+ #include "k3-pinctrl.h"
+ 
+@@ -53,7 +54,6 @@ icssg1-ethernet {
+ 		ti,iep = <&icssg1_iep0>, <&icssg1_iep1>;
+ 		ti,mii-g-rt = <&icssg1_mii_g_rt>;
+ 		ti,mii-rt = <&icssg1_mii_rt>;
+-		ti,pa-stats = <&icssg1_pa_stats>;
+ 		ti,prus = <&pru1_0>, <&rtu1_0>, <&tx_pru1_0>, <&pru1_1>, <&rtu1_1>, <&tx_pru1_1>;
+ 		ti,pruss-gp-mux-sel = <2>,	/* MII mode */
+ 				      <2>,
+@@ -91,6 +91,7 @@ icssg1_mdio_pins_default: icssg1-mdio-pins-default {
+ 		pinctrl-single,pins = <
+ 			AM64X_IOPAD(0x015c, PIN_OUTPUT, 0) /* (Y6) PRG1_MDIO0_MDC */
+ 			AM64X_IOPAD(0x0158, PIN_INPUT, 0)  /* (AA6) PRG1_MDIO0_MDIO */
++			AM64X_IOPAD(0x00d4, PIN_OUTPUT, 7)  /* (U13) PRG1_PRU0_GPO7.GPIO0_52 */
+ 		>;
+ 	};
+ 
+@@ -136,6 +137,9 @@ &icssg1_mdio {
+ 	#size-cells = <0>;
+ 	status = "okay";
+ 
++	reset-gpios = <&main_gpio0 52 GPIO_ACTIVE_LOW>;
++	reset-assert-us = <2>;
++
+ 	icssg1_phy1: ethernet-phy@1 {
+ 		reg = <0x1>;
+ 		rx-fifo-depth = <DP83869_PHYCR_FIFO_DEPTH_4_B_NIB>;
+-- 
+2.25.1
+
