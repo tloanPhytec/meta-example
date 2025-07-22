@@ -1,0 +1,22 @@
+From 2fe5d8ef21c7710ce883509c7ef9bc723d749438 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 22 Jul 2025 18:44:11 +0000
+Subject: [PATCH] am64: env: phytec: Enable PEB-C-010 Expansion Overlay
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ board/phytec/phycore_am64x/phycore_am64x.env | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/board/phytec/phycore_am64x/phycore_am64x.env b/board/phytec/phycore_am64x/phycore_am64x.env
+index d04a3be6864..fd07a3e3bac 100644
+--- a/board/phytec/phycore_am64x/phycore_am64x.env
++++ b/board/phytec/phycore_am64x/phycore_am64x.env
+@@ -23,3 +23,4 @@ get_cmd=tftp
+ spi_fdt_addr=0x700000
+ spi_image_addr=0x800000
+ spi_ramdisk_addr=0x2200000
++overlays=k3-am642-phyboard-electra-peb-c-010.dtbo
+-- 
+2.25.1
+
