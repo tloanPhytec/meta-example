@@ -1,0 +1,26 @@
+From 919af13dcefa0a88dbe2f876c9b094704e055426 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 29 Jul 2025 18:05:14 +0000
+Subject: [PATCH] arm: dts: am5728-phytec-pcm-948-40300111I.dts: prevent gpio1
+ reset on init
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ arch/arm/boot/dts/am5728-phytec-pcm-948-40300111I.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/am5728-phytec-pcm-948-40300111I.dts b/arch/arm/boot/dts/am5728-phytec-pcm-948-40300111I.dts
+index 0900613bd2d8..df5e7bb47533 100644
+--- a/arch/arm/boot/dts/am5728-phytec-pcm-948-40300111I.dts
++++ b/arch/arm/boot/dts/am5728-phytec-pcm-948-40300111I.dts
+@@ -8,3 +8,7 @@
+ 
+ #include "am5728-phycore-som.dtsi"
+ #include "am57xx-pcm-948.dtsi"
++
++&gpio1 {
++	ti,no-reset-on-init;
++};
+-- 
+2.25.1
+
