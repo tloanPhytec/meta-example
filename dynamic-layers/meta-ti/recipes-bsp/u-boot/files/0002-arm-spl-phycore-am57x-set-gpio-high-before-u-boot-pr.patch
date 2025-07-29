@@ -1,0 +1,61 @@
+From 7bc61f6f19d0521e6a40fc7b4720d9adcc30efd9 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 29 Jul 2025 21:42:46 +0000
+Subject: [PATCH 2/2] arm: spl: phycore-am57x: set gpio high before u-boot
+ proper
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ board/phytec/phycore_am57x/mux_data.h      |  3 +++
+ board/phytec/phycore_am57x/phycore-am57x.c | 11 +++++++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/board/phytec/phycore_am57x/mux_data.h b/board/phytec/phycore_am57x/mux_data.h
+index 208c4134093..8a06e05a347 100644
+--- a/board/phytec/phycore_am57x/mux_data.h
++++ b/board/phytec/phycore_am57x/mux_data.h
+@@ -185,6 +185,9 @@ const struct pad_conf_entry early_padconf[] = {
+ 	/* I2C1 */
+ 	{I2C1_SDA, (M0 | PIN_INPUT_PULLUP)}, /* I2C1_SDA */
+ 	{I2C1_SCL, (M0 | PIN_INPUT_PULLUP)}, /* I2C1_SCL */
++
++	/* GPIO_HOG_0 */
++	{MMC3_DAT5, (M14 | PIN_OUTPUT)}, /* MMC3_DAT5.GPIO1_23 */
+ };
+ 
+ #ifdef CONFIG_IODELAY_RECALIBRATION
+diff --git a/board/phytec/phycore_am57x/phycore-am57x.c b/board/phytec/phycore_am57x/phycore-am57x.c
+index 4a11bb7885b..6fd3d29728b 100644
+--- a/board/phytec/phycore_am57x/phycore-am57x.c
++++ b/board/phytec/phycore_am57x/phycore-am57x.c
+@@ -61,6 +61,7 @@ DECLARE_GLOBAL_DATA_PTR;
+ #define TPS65903X_PAD2_POWERHOLD_MASK		0x20
+ 
+ #define GPIO_DDR_VTT_EN		GPIO_TO_PIN(4, 8) /* vin2a_d7.gpio4_8 */
++#define GPIO_HOG_0              GPIO_TO_PIN(1, 23) /* mmc3_dat5.gpio1_23 */
+ 
+ #define EEPROM_ADDR		0x50
+ 
+@@ -722,9 +723,19 @@ static inline void vtt_regulator_enable(void)
+ 	gpio_direction_output(GPIO_DDR_VTT_EN, 1);
+ }
+ 
++static inline void gpio_hog_enable(void)
++{
++	if (omap_hw_init_context() == OMAP_INIT_CONTEXT_UBOOT_AFTER_SPL)
++		return;
++
++	gpio_request(GPIO_HOG_0, "gpio_hog_0");
++	gpio_direction_output(GPIO_HOG_0, 1);
++}
++
+ int board_early_init_f(void)
+ {
+ 	vtt_regulator_enable();
++	gpio_hog_enable();
+ 	return 0;
+ }
+ #endif
+-- 
+2.25.1
+

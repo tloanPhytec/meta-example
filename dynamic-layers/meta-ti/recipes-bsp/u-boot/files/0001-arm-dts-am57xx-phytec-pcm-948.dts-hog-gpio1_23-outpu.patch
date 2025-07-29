@@ -1,0 +1,57 @@
+From 659a4db60bb2ea4f057deda09053165e8b0e932f Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 29 Jul 2025 21:42:32 +0000
+Subject: [PATCH 1/2] arm: dts: am57xx-phytec-pcm-948.dts: hog gpio1_23,
+ output-high
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ arch/arm/dts/am57xx-phytec-pcm-948.dts | 23 +++++++++++++++++++++++
+ configs/phycore_am57x_defconfig        |  3 +++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/arch/arm/dts/am57xx-phytec-pcm-948.dts b/arch/arm/dts/am57xx-phytec-pcm-948.dts
+index 69b191bd8d3..8a7f606a898 100644
+--- a/arch/arm/dts/am57xx-phytec-pcm-948.dts
++++ b/arch/arm/dts/am57xx-phytec-pcm-948.dts
+@@ -8,3 +8,26 @@
+ 
+ #include "am5716-phycore-som.dtsi"
+ #include "am57xx-pcm-948.dtsi"
++
++&dra7_pmx_core {
++        gpio1_hog_pins: gpio1_hog_pins {
++                pinctrl-single,pins = <
++                        DRA7XX_CORE_IOPAD(0x3798, PIN_OUTPUT | MUX_MODE14)
++                >;
++        };
++};
++
++&gpio1 {
++    pinctrl-names = "default";
++    pinctrl-0 = <&gpio1_hog_pins>;
++    status="okay";
++
++    ti,no-reset-on-init;
++
++    gpio-node {
++        gpio-hog;
++        gpios = <23 GPIO_ACTIVE_HIGH>;
++        output-high;
++        line-name = "my-signal";
++    };
++};
+diff --git a/configs/phycore_am57x_defconfig b/configs/phycore_am57x_defconfig
+index c58863178b3..cfa5578adb7 100644
+--- a/configs/phycore_am57x_defconfig
++++ b/configs/phycore_am57x_defconfig
+@@ -113,3 +113,6 @@ CONFIG_USB_GADGET=y
+ CONFIG_USB_GADGET_MANUFACTURER="Texas Instruments"
+ CONFIG_USB_GADGET_VENDOR_NUM=0x0451
+ CONFIG_USB_GADGET_PRODUCT_NUM=0xd022
++CONFIG_GPIO_HOG=y
++CONFIG_PINCTRL=y
++CONFIG_PINCTRL_SINGLE=y
+-- 
+2.25.1
+
