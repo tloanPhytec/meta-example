@@ -37,6 +37,12 @@ MACHINE=phyboard-electra-am64xx-2 DISTRO=ampliphy bitbake phytec-headless-image
 
 Prior to powering ON the development kit, connect your PEB-C-010 Ethernet Expansion Board to the phyCORE-AM64x Development Kit's X28 Expansion Connector. 
 
+![IMG_0131](https://github.com/user-attachments/assets/e9ae92e1-a28c-440c-a88b-a08a7a26c422)
+
+> **_NOTE:_**  **Connect the PEB-C-010 in the orientation shown above, the expansion board should hang off of the development kit carrier board.**
+>
+> The reverse orientation DOES NOT WORK.
+
 Once connected boot your target's image all the way into Linux (this meta-example reference enables the overlay by default, so you don't have to manually enable the overlay in the bootloader console). 
 
 Once booted into Linux Userspace, we can confirm that the new network interfaces eth3 and eth4 are now available like this:
