@@ -1,0 +1,111 @@
+From 5f940d48379056f5e288d3912ce2e36da5b5fc84 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 7 Oct 2025 17:29:20 +0000
+Subject: [PATCH] wip: 8mp: fpsc: rauc fix
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ .../imx8mp-libra-fpsc/imx8mp-libra-fpsc.env   | 75 +++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+
+diff --git a/board/phytec/imx8mp-libra-fpsc/imx8mp-libra-fpsc.env b/board/phytec/imx8mp-libra-fpsc/imx8mp-libra-fpsc.env
+index edcd05aedd2..bb6d324bff6 100644
+--- a/board/phytec/imx8mp-libra-fpsc/imx8mp-libra-fpsc.env
++++ b/board/phytec/imx8mp-libra-fpsc/imx8mp-libra-fpsc.env
+@@ -1,8 +1,47 @@
++#include <env/phytec/rauc.env>
++#include <env/phytec/overlays.env>
++#include <env/phytec/fitboot.env>
++
++bootcmd=
++        if test ${dofastboot} = 1; then
++                fastboot 0;
++        fi;
++        if test ${dolegacyboot} = 1; then
++                run legacyboot;
++        fi;
++        bootflow scan -lb;
++        if test ${doefiboot} = 1; then
++                setenv bootmeths "efi_mgr efi";
++                setenv boot_targets "mmc2 mmc1 usb";
++                bootflow scan -l;
++                bootflow scan -lb;
++        fi;
++legacyboot=
++        if test ${dofastboot} = 1; then
++                fastboot 0;
++        fi;
++        mmc dev ${mmcdev};
++        if mmc rescan; then
++                if test ${doraucboot} = 1; then
++                        run raucinit;
++                fi;
++                if run loadimage; then
++                        run mmcboot;
++                else
++                        if test ${doraucboot} = 1 || test ${dofitboot} = 1; then
++                                reset;
++                        fi;
++                fi;
++        fi;
++
++doefiboot=1
+ bootmeths=script
+ boot_targets=mmc2 mmc1 ethernet
+ boot_script_dhcp=boot.scr.uimg
+ bootenv_addr_r=0x49100000
+ console=ttymxc3,115200
++dofastboot=0
++dolegacyboot=1
+ emmc_dev=2  /* This is needed by built-in uuu flash scripts */
+ fdt_addr_r=0x48000000
+ fdtfile=CONFIG_DEFAULT_FDT_FILE
+@@ -10,9 +49,45 @@ fdtoverlay_addr_r=0x49000000
+ fit_fdtconf=conf-imx8mp-libra-rdk-fpsc.dtb
+ ip_dyn=no
+ ipaddr=192.168.3.11
++image=fitImage
++serverip=192.168.3.10
++netmask=255.225.255.0
+ kernel_addr_r=0x5A080000
+ kernel_comp_addr_r=0x60000000
+ kernel_comp_size=0x2000000
++loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}
++loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${fdtfile}
++mmcargs=
++        setenv bootargs console=${console} ${optargs}
++        root=/dev/mmcblk${mmcdev}p${mmcroot} ${raucargs} fsck.repair=yes rootwait rw
++mmcautodetect=yes
++mmc_apply_extensions=
++        if test ${no_extensions} = 0; then
++                setenv extension_overlay_addr ${fdtoverlay_addr_r};
++                setenv extension_overlay_cmd "fatload mmc ${mmcdev}:${mmcpart} ${fdtoverlay_addr_r} ${extension_overlay_name}";
++                extension scan;
++                extension apply all;
++        fi;
++mmcboot=
++        echo Booting from mmc ...;
++        if test ${no_bootenv} = 0; then
++                if run mmc_load_bootenv; then
++                        if test ${dofitboot} = 1; then
++                                env import -t ${bootenv_addr_r} ${filesize} overlays;
++                        else
++                                env import -t ${bootenv_addr_r} ${filesize};
++                        fi;
++                fi;
++        fi;
++        run mmcargs;
++        run fit_test_and_run_boot;
++        if run loadfdt; then
++                run mmc_apply_overlays;
++                run mmc_apply_extensions;
++                booti ${loadaddr} - ${fdt_addr_r};
++        else
++                echo WARN: Cannot load the DT;
++        fi;
+ mmcautodetect=yes
+ mmcdev=CONFIG_SYS_MMC_ENV_DEV
+ mmcpart=1
+-- 
+2.34.1
+

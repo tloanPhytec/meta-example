@@ -1,0 +1,29 @@
+From 1b3d127a179d4d9833794f5c6f9f52f3d39ba00f Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 7 Oct 2025 21:07:33 +0000
+Subject: [PATCH] wip: 8mp: fpsc: rauc: whitelist RAUC env vars
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ include/configs/imx8mp-libra-fpsc.h | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/include/configs/imx8mp-libra-fpsc.h b/include/configs/imx8mp-libra-fpsc.h
+index fa06eaf058a..e4200912aed 100644
+--- a/include/configs/imx8mp-libra-fpsc.h
++++ b/include/configs/imx8mp-libra-fpsc.h
+@@ -12,6 +12,11 @@
+ #define CFG_SYS_UBOOT_BASE \
+ 		(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
+ 
++#ifdef CONFIG_ENV_WRITEABLE_LIST
++/* Set environment flag validation to a list of env vars that must be writable */
++#define CFG_ENV_FLAGS_LIST_STATIC "BOOT_ORDER:sw,BOOT_system0_LEFT:dw,BOOT_system1_LEFT:dw,optargs:sw"
++#endif
++
+ /* Link Definitions */
+ 
+ #define CFG_SYS_INIT_RAM_ADDR	0x40000000
+-- 
+2.34.1
+
