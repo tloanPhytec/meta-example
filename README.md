@@ -16,6 +16,8 @@ Clone this repo and branch:
 
 ```sh
 git clone https://github.com/tloanPhytec/meta-example.git -b am62-scarthgap-chromium
+cd meta-example
+git submodule update --init
 ```
 
 Enable the layer and its sub-layers (this meta-example branch depends on meta-browser and meta-clang, both are set up as git submodules in this meta-example branch):
