@@ -38,7 +38,7 @@ vi $BUILDDIR/conf/local.conf
 Rebuild your phytec-qt6demo-image with bitbake and use the resulting image to boot your Development Kit.
 
 ```sh
-bitbake phytec-qt6-demo
+bitbake phytec-qt6demo-image
 ```
 
 In order to launch the chromium browser to your connected HDMI display, run the following command once in Linux userspace:
