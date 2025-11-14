@@ -1,0 +1,44 @@
+From abc7db9e2836a3b4aa6611540b4c77b65c380937 Mon Sep 17 00:00:00 2001
+From: John Ma <jma@phytec.com>
+Date: Tue, 11 Nov 2025 18:26:31 -0800
+Subject: [PATCH 1/2] board: phytec: phycore_am67x: Fixup DDR size
+
+Call k3-ddrss driver through fixup_ddr_driver_for_ecc() to fixup the
+device tree and resize the available amount of DDR, if ECC is enabled.
+Otherwise, fixup the device tree using the regular
+fixup_memory_banks().
+
+Based on commit 93a74d4f178b ("UPSTREAM: board: ti: Pull redundant DDR functions to a common location and Fixup DDR size when ECC is enabled"
+
+Signed-off-by: John Ma <jma@phytec.com>
+---
+ board/phytec/phycore_am67x/phycore-am67x.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/board/phytec/phycore_am67x/phycore-am67x.c b/board/phytec/phycore_am67x/phycore-am67x.c
+index a6a139ca7e4..9d197cfe48f 100644
+--- a/board/phytec/phycore_am67x/phycore-am67x.c
++++ b/board/phytec/phycore_am67x/phycore-am67x.c
+@@ -61,12 +61,14 @@ void spl_board_init(void)
+ 	       MCU_CTRL_DEVICE_CLKOUT_32K_CTRL);
+ }
+ 
+-#if defined(CONFIG_SPL_BUILD)
++#if defined(CONFIG_XPL_BUILD)
+ void spl_perform_fixups(struct spl_image_info *spl_image)
+ {
+-	if (IS_ENABLED(CONFIG_K3_DDRSS) && IS_ENABLED(CONFIG_K3_INLINE_ECC))
+-		fixup_ddr_driver_for_ecc(spl_image);
+-	else
++	if (IS_ENABLED(CONFIG_K3_DDRSS)) {
++		if (IS_ENABLED(CONFIG_K3_INLINE_ECC))
++			fixup_ddr_driver_for_ecc(spl_image);
++	} else {
+ 		fixup_memory_node(spl_image);
++	}
+ }
+ #endif
+-- 
+2.43.0
+
+
