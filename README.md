@@ -4,7 +4,7 @@ This branch serves as a reference for customizing the phyCORE-AM64x SOM such tha
 
 While the nonstandard pinout of the phyCORE-AM64x SOM was designed to accomodate all features of the AM64x processor, the development kit was not designed with this flexability in mind. Thus, when using this software with the development kit carrier board, some of the UARTs are not conventiently broken out to expansion headers and some of the UARTs will conflict with other peripheral interfaces (such as the User Button and MCAN0 interfaces) that are implemented onboard. It is therefore neccessary to utilize flying probes and/or rework the development kit carrier board to verify these interfaces. 
 
-This was tested with **BSP-Yocto-Ampliphy-AM64x-PD25.1.0**
+This was tested with **BSP-Yocto-Ampliphy-AM64x-PD25.2.0**
 
 ## BSP Integration
 
