@@ -22,6 +22,7 @@ SRC_URI = "\
 # PHYTEC-specific software customizations
 SRC_URI += "\
 	file://0001-phyCORE-AM62Lx-Embedded-World-LVGL-Demo.patch \
+	file://phyFLEX-AM62L-FPSC-front_500x540.png \
 	"
 SRCREV_demo = "dccc6a1ca48372aa993dbea7a8e17dec6f42df6a"
 SRCREV_lvgl = "e1c0b21b2723d391b885de4b2ee5cc997eccca91"
@@ -57,4 +58,9 @@ S = "${WORKDIR}/git"
 do_install:append() {
 	install -d ${D}${bindir}
 	install -m 0755 ${S}/bin/main ${D}${bindir}/lvgl
+
+	install -d ${D}${datadir}/lvgl-demo
+	install -m 0644 ${WORKDIR}/phyFLEX-AM62L-FPSC-front_500x540.png ${D}${datadir}/lvgl-demo/
 }
+
+FILES:${PN} += "${datadir}/lvgl-demo/phyFLEX-AM62L-FPSC-front_500x540.png"

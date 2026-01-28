@@ -21,7 +21,7 @@ index 4b66ebc..2fba379 100644
 +#include <stdlib.h>
 +#include <stdio.h>
  
-+#define IMG_PATH "A:test.png"
++#define IMG_PATH "A:/usr/share/lvgl-demo/phyFLEX-AM62L-FPSC-front_500x540.png"
 +
 +/* -------------------------------------------------------------------------- */
 +/* Helper: Clamp value between min and max                                    */
