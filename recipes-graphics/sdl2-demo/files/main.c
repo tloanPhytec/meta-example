@@ -17,8 +17,9 @@ const char *vertex_src =
     "uniform mat4 u_matrix; \n"
     "varying vec4 v_color; \n"
     "void main() { \n"
-    "    gl_Position = u_matrix * a_position; \n"
-    "    v_color = a_color; \n"
+    "    gl_Position = a_position * u_matrix; \n"
+    "    float shade = (a_position.y + 25.0) / 50.0; \n"
+    "    v_color = a_color * (0.5 + 0.5 * shade); \n"
     "} \n";
 
 const char *fragment_src =
@@ -179,7 +180,13 @@ int main(int argc, char **argv) {
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
 
-	if (h == 0) h = 1;
+	//printf("[DEBUG] Frame Height: %d\n", h);
+	//printf("[DEBUG] Frame Width: %d\n", w);
+
+	if (h == 0) {
+	    printf("[DEBUG] Frame Height ERROR: Height = 0 pixels!\n");
+	    break;
+	}
 
         glViewport(0, 0, w, h);
 
@@ -197,11 +204,10 @@ int main(int argc, char **argv) {
         scale_mat.m[2][2] = 0.1f;
         model = multiply(scale_mat, model);
 
-        /* 5. TRANSLATE: Move back 15 units */
-        //model = multiply(translate(0, 0, -30.0f), model); 
+        model = multiply(translate(0, 0, -50.0f), model);
 
         /* 6. Combine (MVP = Projection * Model) */
-        Mat4 mvp = multiply(proj, model);
+        Mat4 mvp = multiply(model, proj);
 
         /* 7. Draw (BLUE Background) */
         glClearColor(0.0f, 0.0f, 1.0f, 1.0f); 
@@ -210,7 +216,7 @@ int main(int argc, char **argv) {
 
 	glDisable(GL_CULL_FACE);
 
-        glUniformMatrix4fv(u_matrix, 1, GL_FALSE, (const GLfloat*)mvp.m);
+        glUniformMatrix4fv(u_matrix, 1, GL_TRUE, (const GLfloat*)mvp.m);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 0);
