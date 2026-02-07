@@ -18,8 +18,8 @@ const char *vertex_src =
     "varying vec4 v_color; \n"
     "void main() { \n"
     "    gl_Position = a_position * u_matrix; \n"
-    "    float shade = (a_position.y + 25.0) / 50.0; \n"
-    "    v_color = a_color * (0.5 + 0.5 * shade); \n"
+    "    float shade = (a_position.z + 2.0) / 4.0; \n"
+    "    v_color = vec4(shade, shade, shade, 1.0); \n"
     "} \n";
 
 const char *fragment_src =
@@ -111,6 +111,8 @@ GLuint compile_shader(GLenum type, const char *src) {
 int main(int argc, char **argv) {
     /* 1. Initialize SDL */
     SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
     
     /* 2. Configure GLES 2.0 */
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -167,12 +169,14 @@ int main(int argc, char **argv) {
         while(SDL_PollEvent(&e)) {
             if(e.type == SDL_QUIT) running = 0;
             else if(e.type == SDL_FINGERMOTION) {
-                rot_y += e.tfinger.dx * 5.0f;
-                rot_x += e.tfinger.dy * 5.0f;
+                rot_y -= e.tfinger.dx * 5.0f;
+                rot_x -= e.tfinger.dy * 5.0f;
+		//printf("[DEBUG] Finger Press!");
             }
             else if(e.type == SDL_MOUSEMOTION && (e.motion.state & SDL_BUTTON_LMASK)) {
-                rot_y += e.motion.xrel * 0.01f;
-                rot_x += e.motion.yrel * 0.01f;
+                rot_y += e.motion.yrel * 0.01f;
+                rot_x += e.motion.xrel * 0.01f;
+		//printf("[DEBUG] Mouse Press!");
             }
         }
 
@@ -202,9 +206,9 @@ int main(int argc, char **argv) {
         scale_mat.m[0][0] = 0.1f; 
         scale_mat.m[1][1] = 0.1f; 
         scale_mat.m[2][2] = 0.1f;
-        model = multiply(scale_mat, model);
+	model = multiply(scale_mat, model);
 
-        model = multiply(translate(0, 0, -50.0f), model);
+        model = multiply(model, translate(0, 0, -7.0f));
 
         /* 6. Combine (MVP = Projection * Model) */
         Mat4 mvp = multiply(model, proj);
