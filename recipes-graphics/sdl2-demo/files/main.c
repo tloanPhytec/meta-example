@@ -18,8 +18,7 @@ const char *vertex_src =
     "varying vec4 v_color; \n"
     "void main() { \n"
     "    gl_Position = a_position * u_matrix; \n"
-    "    float shade = (a_position.z + 2.0) / 4.0; \n"
-    "    v_color = vec4(shade, shade, shade, 1.0); \n"
+    "    v_color = a_color; \n"
     "} \n";
 
 const char *fragment_src =
@@ -141,27 +140,11 @@ int main(int argc, char **argv) {
 
     GLint u_matrix = glGetUniformLocation(prog, "u_matrix");
 
-    /* 5. Load Data from model_data.h */
-
-    /* ADDED: Bounds Check to see if model is off-screen */
-    float min_y = 1000.0f, max_y = -1000.0f;
-    /* Vertices are Stride 6 (X, Y, Z, R, G, B). Check Y (index 1) */
-    for(int i=1; i < num_vertices; i+=6) {
-        if(model_vertices[i] < min_y) min_y = model_vertices[i];
-        if(model_vertices[i] > max_y) max_y = model_vertices[i];
-    }
-    printf("[DEBUG] Model Y-Range: %.2f to %.2f\n", min_y, max_y);
-    printf("[DEBUG] Num Indices: %d (Short Limit: 65535)\n", num_indices);
-
-    GLuint vbo, ibo;
-    glGenBuffers(1, &vbo); glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(model_vertices), model_vertices, GL_STATIC_DRAW);
-    
-    glGenBuffers(1, &ibo); glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(model_indices), model_indices, GL_STATIC_DRAW);
-
     float rot_x = 0.0f, rot_y = 0.0f;
     int running = 1;
+
+    Uint32 last_fps_print = SDL_GetTicks();
+    int frame_count = 0;
 
     /* 6. Render Loop */
     while(running) {
@@ -222,18 +205,21 @@ int main(int argc, char **argv) {
 
         glUniformMatrix4fv(u_matrix, 1, GL_TRUE, (const GLfloat*)mvp.m);
 
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), 0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+        for (int i = 0; i < num_objects; i++) {
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), my_model[i].vertices);
+	    glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(my_model[i].vertices + 3));
+            glDrawElements(GL_TRIANGLES, my_model[i].num_indices, GL_UNSIGNED_INT, my_model[i].indices);
+        }
 
-        glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
-
-        static int frame_count = 0;
-        if(frame_count++ % 60 == 0) {
-             check_gl_error("glDrawElements");
-             printf("[DEBUG] Frame %d rendered\n", frame_count);
-             fflush(stdout); 
+        frame_count++;
+        Uint32 now = SDL_GetTicks();
+        if (now - last_fps_print >= 1000) {
+            printf("[FPS] %d | Objects: %d\n", frame_count, num_objects);
+            fflush(stdout);
+            frame_count = 0;
+            last_fps_print = now;
         }
 
         SDL_GL_SwapWindow(window);
