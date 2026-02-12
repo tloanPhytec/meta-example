@@ -17,8 +17,10 @@ const char *vertex_src =
     "uniform mat4 u_matrix; \n"
     "varying vec4 v_color; \n"
     "void main() { \n"
+    "    float shade = (a_position.z + 5.0) / 10.0; \n"
+    "    shade = clamp(shade, 0.7, 1.0); \n"
     "    gl_Position = a_position * u_matrix; \n"
-    "    v_color = a_color; \n"
+    "    v_color = vec4(a_color.rgb * shade, 1.0); \n"
     "} \n";
 
 const char *fragment_src =
@@ -140,6 +142,17 @@ int main(int argc, char **argv) {
 
     GLint u_matrix = glGetUniformLocation(prog, "u_matrix");
 
+    /* 5. Move data to GPU once using VBOs */
+    for (int i = 0; i < num_objects; i++) {
+        glGenBuffers(1, &my_model[i].vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, my_model[i].vbo);
+        glBufferData(GL_ARRAY_BUFFER, my_model[i].num_vertices * 6 * sizeof(GLfloat), my_model[i].vertices, GL_STATIC_DRAW);
+
+        glGenBuffers(1, &my_model[i].ibo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_model[i].ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, my_model[i].num_indices * sizeof(GLuint), my_model[i].indices, GL_STATIC_DRAW);
+    }
+
     float rot_x = 0.0f, rot_y = 0.0f;
     int running = 1;
 
@@ -206,11 +219,14 @@ int main(int argc, char **argv) {
         glUniformMatrix4fv(u_matrix, 1, GL_TRUE, (const GLfloat*)mvp.m);
 
         for (int i = 0; i < num_objects; i++) {
+	    glBindBuffer(GL_ARRAY_BUFFER, my_model[i].vbo);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, my_model[i].ibo);
+
             glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), my_model[i].vertices);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	    glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(my_model[i].vertices + 3));
-            glDrawElements(GL_TRIANGLES, my_model[i].num_indices, GL_UNSIGNED_INT, my_model[i].indices);
+	    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+            glDrawElements(GL_TRIANGLES, my_model[i].num_indices, GL_UNSIGNED_INT, (void*)0);
         }
 
         frame_count++;
