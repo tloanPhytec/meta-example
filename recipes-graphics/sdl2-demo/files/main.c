@@ -30,6 +30,43 @@ const char *fragment_src =
     "    gl_FragColor = v_color; \n"
     "} \n";
 
+const char *hud_vs =
+    "attribute vec4 a_pos; \n"
+    "attribute vec2 a_uv; \n"
+    "varying vec2 v_uv; \n"
+    "void main() { \n"
+    "    gl_Position = a_pos; \n"
+    "    v_uv = a_uv; \n"
+    "} \n";
+
+const char *hud_fs =
+    "precision mediump float; \n"
+    "varying vec2 v_uv; \n"
+    "uniform sampler2D u_tex; \n"
+    "void main() { \n"
+    "    vec4 color = texture2D(u_tex, v_uv); \n"
+    "    if(color.r < 0.1) discard; \n" // Make background transparent
+    "    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); \n" // Black HUD text
+    "} \n";
+
+/* --- Simple 8x8 Font Data for 0-9 and 'FPS: ' --- */
+const unsigned char font8x8[14][8] = {
+    {0x3E,0x61,0x61,0x61,0x61,0x61,0x3E,0x00}, // 0
+    {0x18,0x08,0x08,0x08,0x08,0x08,0x08,0x00}, // 1
+    {0x3E,0x01,0x01,0x3E,0x60,0x60,0x3E,0x00}, // 2
+    {0x3E,0x01,0x01,0x3E,0x01,0x01,0x3E,0x00}, // 3
+    {0x61,0x61,0x61,0x3F,0x01,0x01,0x01,0x00}, // 4
+    {0x3F,0x60,0x60,0x3E,0x01,0x01,0x3E,0x00}, // 5
+    {0x3E,0x60,0x60,0x3E,0x61,0x61,0x3E,0x00}, // 6
+    {0x3F,0x01,0x01,0x02,0x04,0x08,0x08,0x00}, // 7
+    {0x3E,0x61,0x61,0x3E,0x61,0x61,0x3E,0x00}, // 8
+    {0x3E,0x61,0x61,0x3F,0x01,0x01,0x3E,0x00}, // 9
+    {0x7F,0x40,0x40,0x7E,0x40,0x40,0x40,0x00}, // F (Index 10)
+    {0x7E,0x41,0x41,0x7E,0x40,0x40,0x40,0x00}, // P (Index 11)
+    {0x3E,0x40,0x40,0x3E,0x01,0x01,0x3E,0x00}, // S (Index 12)
+    {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}  // Space (Index 13)
+};
+
 /* --- Math Helpers --- */
 typedef struct { float m[4][4]; } Mat4;
 
@@ -109,6 +146,29 @@ GLuint compile_shader(GLenum type, const char *src) {
     return shader;
 }
 
+/* --- Render FPS to Texture --- */
+void update_fps_texture(GLuint tex, int fps) {
+    char buf[16];
+    sprintf(buf, "FPS %d", fps);
+    unsigned char pixels[32 * 128] = {0}; // Tiny buffer
+    for(int i=0; buf[i] != '\0'; i++) {
+	int glyph;
+        if      (buf[i] >= '0' && buf[i] <= '9') glyph = buf[i] - '0';
+        else if (buf[i] == 'F') glyph = 10;
+        else if (buf[i] == 'P') glyph = 11;
+        else if (buf[i] == 'S') glyph = 12;
+        else                    glyph = 13; // Space
+        for(int y=0; y<8; y++) {
+            for(int x=0; x<8; x++) {
+                if(font8x8[glyph][y] & (1 << (7-x)))
+                    pixels[(y+4)*128 + (i*8+x+4)] = 255;
+            }
+        }
+    }
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 128, 32, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+}
+
 int main(int argc, char **argv) {
     /* 1. Initialize SDL */
     SDL_Init(SDL_INIT_VIDEO);
@@ -124,9 +184,9 @@ int main(int argc, char **argv) {
 
     /* 3. Create Window */
     SDL_Window *window = SDL_CreateWindow("AM62P 3D", 0, 0, WIN_WIDTH, WIN_HEIGHT,
-                                          SDL_WINDOW_OPENGL);
+                                          SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-    printf("[DEBUG] SDL Video Driver: %s\n", SDL_GetCurrentVideoDriver());
+    //printf("[DEBUG] SDL Video Driver: %s\n", SDL_GetCurrentVideoDriver());
 
     SDL_GL_CreateContext(window);
 
@@ -140,7 +200,22 @@ int main(int argc, char **argv) {
     glLinkProgram(prog);
     glUseProgram(prog);
 
+    /* Setup HUD Shader */
+    GLuint hvs = compile_shader(GL_VERTEX_SHADER, hud_vs);
+    GLuint hfs = compile_shader(GL_FRAGMENT_SHADER, hud_fs);
+    GLuint hud_prog = glCreateProgram();
+    glAttachShader(hud_prog, hvs); glAttachShader(hud_prog, hfs);
+    glLinkProgram(hud_prog);
+
     GLint u_matrix = glGetUniformLocation(prog, "u_matrix");
+
+    /* Setup FPS Overlay Texture */
+    GLuint fps_tex;
+    glGenTextures(1, &fps_tex);
+    glBindTexture(GL_TEXTURE_2D, fps_tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    update_fps_texture(fps_tex, 0);
 
     /* 5. Move data to GPU once using VBOs */
     for (int i = 0; i < num_objects; i++) {
@@ -155,6 +230,8 @@ int main(int argc, char **argv) {
 
     float rot_x = 0.0f, rot_y = 0.0f;
     int running = 1;
+
+    float zoom_z = -7.0f;
 
     Uint32 last_fps_print = SDL_GetTicks();
     int frame_count = 0;
@@ -173,6 +250,12 @@ int main(int argc, char **argv) {
                 rot_y += e.motion.yrel * 0.01f;
                 rot_x += e.motion.xrel * 0.01f;
 		//printf("[DEBUG] Mouse Press!");
+            }
+	    else if(e.type == SDL_MULTIGESTURE) {
+                // dDist is positive for pinching out, negative for pinching in
+                zoom_z += e.mgesture.dDist * 20.0f;
+                if (zoom_z > -2.0f) zoom_z = -2.0f; // Don't clip through the camera
+                if (zoom_z < -20.0f) zoom_z = -20.0f; // Don't disappear
             }
         }
 
@@ -204,13 +287,13 @@ int main(int argc, char **argv) {
         scale_mat.m[2][2] = 0.1f;
 	model = multiply(scale_mat, model);
 
-        model = multiply(model, translate(0, 0, -7.0f));
+        model = multiply(model, translate(0, 0, zoom_z));
 
         /* 6. Combine (MVP = Projection * Model) */
         Mat4 mvp = multiply(model, proj);
 
         /* 7. Draw (BLUE Background) */
-        glClearColor(0.0f, 0.0f, 1.0f, 1.0f); 
+	glClearColor(0.820f, 0.812f, 0.824f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
 
@@ -229,10 +312,30 @@ int main(int argc, char **argv) {
             glDrawElements(GL_TRIANGLES, my_model[i].num_indices, GL_UNSIGNED_INT, (void*)0);
         }
 
+	/* --- DRAW FPS HUD --- */
+        glUseProgram(hud_prog);
+        glDisable(GL_DEPTH_TEST); // Draw on top
+        glBindTexture(GL_TEXTURE_2D, fps_tex);
+
+        // Simple 2D Quad in top-left (-1.0 to 1.0 space)
+        float hud_verts[] = {
+            -0.95f,  0.95f, 0.0f, 0.0f, // Pos X, Y, UV U, V
+            -0.65f,  0.95f, 1.0f, 0.0f,
+            -0.95f,  0.85f, 0.0f, 1.0f,
+            -0.65f,  0.85f, 1.0f, 1.0f
+        };
+        glBindBuffer(GL_ARRAY_BUFFER, 0); // Use client-side for tiny quad
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), hud_verts);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), &hud_verts[2]);
+        glEnableVertexAttribArray(0); glEnableVertexAttribArray(1);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glUseProgram(prog); // Switch back to 3D shader
+
         frame_count++;
         Uint32 now = SDL_GetTicks();
         if (now - last_fps_print >= 1000) {
-            printf("[FPS] %d | Objects: %d\n", frame_count, num_objects);
+	    update_fps_texture(fps_tex, frame_count);
+            //printf("[FPS] %d | Objects: %d\n", frame_count, num_objects);
             fflush(stdout);
             frame_count = 0;
             last_fps_print = now;
