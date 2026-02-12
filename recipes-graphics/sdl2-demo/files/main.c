@@ -17,8 +17,8 @@ const char *vertex_src =
     "uniform mat4 u_matrix; \n"
     "varying vec4 v_color; \n"
     "void main() { \n"
-    "    float shade = (a_position.z + 5.0) / 10.0; \n"
-    "    shade = clamp(shade, 0.7, 1.0); \n"
+    "    float shade = (a_position.z + 7.5) / 10.0; \n"
+    "    shade = clamp(shade, 0.5, 1.1); \n" // Floor is 85%, Ceiling is 110%
     "    gl_Position = a_position * u_matrix; \n"
     "    v_color = vec4(a_color.rgb * shade, 1.0); \n"
     "} \n";
@@ -233,6 +233,9 @@ int main(int argc, char **argv) {
 
     float zoom_z = -7.0f;
 
+    Uint32 last_interaction_time = SDL_GetTicks();
+    int is_auto_rotating = 0;
+
     Uint32 last_fps_print = SDL_GetTicks();
     int frame_count = 0;
 
@@ -245,18 +248,34 @@ int main(int argc, char **argv) {
                 rot_y -= e.tfinger.dx * 5.0f;
                 rot_x -= e.tfinger.dy * 5.0f;
 		//printf("[DEBUG] Finger Press!");
+                last_interaction_time = SDL_GetTicks();
+                is_auto_rotating = 0;
             }
             else if(e.type == SDL_MOUSEMOTION && (e.motion.state & SDL_BUTTON_LMASK)) {
                 rot_y += e.motion.yrel * 0.01f;
                 rot_x += e.motion.xrel * 0.01f;
 		//printf("[DEBUG] Mouse Press!");
+                last_interaction_time = SDL_GetTicks();
+                is_auto_rotating = 0;
             }
 	    else if(e.type == SDL_MULTIGESTURE) {
                 // dDist is positive for pinching out, negative for pinching in
                 zoom_z += e.mgesture.dDist * 20.0f;
                 if (zoom_z > -2.0f) zoom_z = -2.0f; // Don't clip through the camera
                 if (zoom_z < -20.0f) zoom_z = -20.0f; // Don't disappear
+                last_interaction_time = SDL_GetTicks();
+                is_auto_rotating = 0;
             }
+        }
+
+	/* Check for 10 seconds of inactivity (10000 ms) */
+        Uint32 current_time = SDL_GetTicks();
+        if (current_time - last_interaction_time > 10000) {
+            is_auto_rotating = 1;
+        }
+
+        if (is_auto_rotating) {
+            rot_y += 0.01f; // Adjust this for spin speed
         }
 
         /* 1. Get Actual Window Size (MOVED TO TOP) */
