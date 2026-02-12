@@ -311,7 +311,7 @@ int main(int argc, char **argv) {
         /* 6. Combine (MVP = Projection * Model) */
         Mat4 mvp = multiply(model, proj);
 
-        /* 7. Draw (BLUE Background) */
+        /* 7. Draw (Off-white Background) */
 	glClearColor(0.820f, 0.812f, 0.824f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
