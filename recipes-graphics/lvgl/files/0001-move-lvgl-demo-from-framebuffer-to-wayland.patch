@@ -1,0 +1,76 @@
+From af8e3a3cc53ac56261dcc783c199f24fea37fee5 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Wed, 18 Feb 2026 01:58:57 +0000
+Subject: [PATCH] move lvgl demo from framebuffer to wayland
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ CMakeLists.txt |  6 +++---
+ main.c         | 24 ++++++++++++++----------
+ 2 files changed, 17 insertions(+), 13 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d91b196..7e67deb 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -8,10 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+ 
+ add_subdirectory(lvgl)
+-target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR})
++target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/lvgl/src/drivers/wayland)
+ 
+-add_executable(main main.c mouse_cursor_icon.c)
++add_executable(main main.c mouse_cursor_icon.c lvgl/src/drivers/wayland/lv_wayland.c lvgl/src/drivers/wayland/lv_wayland_smm.c lvgl/src/drivers/wayland/wayland_xdg_shell.c)
+ 
+-target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} m pthread)
++target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} wayland-client wayland-cursor xkbcommon m pthread)
+ add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+ 
+diff --git a/main.c b/main.c
+index 9775b9c..1f27b5a 100644
+--- a/main.c
++++ b/main.c
+@@ -1,25 +1,29 @@
+ #include "lvgl/lvgl.h"
+ #include "lvgl/demos/lv_demos.h"
++#include "lvgl/src/drivers/wayland/lv_wayland.h"
++
+ #include <unistd.h>
+-#include <pthread.h>
+-#include <time.h>
+ 
+ int main(void)
+ {
+     lv_init();
+ 
+-    /*Linux frame buffer device init*/
+-    lv_display_t * disp = lv_linux_fbdev_create();
+-    lv_linux_fbdev_set_file(disp, "/dev/fb0");
++    lv_display_t * disp = lv_wayland_window_create(1280, 800, "LVGL Demo", NULL);
++    lv_wayland_window_set_fullscreen(disp, true);
++
++    for(int i = 0; i < 10; i++) {
++        lv_wayland_timer_handler();
++        usleep(10000);
++    }
+ 
+-    /*Create a Demo*/
++    /* 2. Create a Demo */
+     lv_demo_widgets();
+-    lv_demo_widgets_start_slideshow();
+ 
+-    /*Handle LVGL tasks*/
++    /* 3. Handle LVGL tasks */
+     while(1) {
+-        lv_timer_handler();
+-        usleep(5000);
++	lv_wayland_timer_handler();
++        uint32_t ms = lv_timer_handler();
++        usleep(ms * 1000);
+     }
+ 
+     return 0;
+-- 
+2.34.1
+
