@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = " \
 SRC_URI = " \
 	git://github.com/lvgl/lv_port_linux.git;protocol=https;branch=master;name=demo \
 	git://github.com/lvgl/lvgl;protocol=https;branch=release/v9.2;name=lvgl;subdir=git/lvgl \
-	file://0001-move-lvgl-demo-from-framebuffer-to-wayland.patch \
+	file://0001-2D-Image-Viewer-Demo-using-Weston.patch \
+	file://AM62L_Front.c \
+	file://AM62L_Back.c \
 "
 
 # v9.2.2 exact release hashes
@@ -69,6 +71,10 @@ do_configure:prepend() {
     # Manually invoke the scanner to create the missing header and glue code
     wayland-scanner client-header ${XDG_SHELL_XML} ${GEN_DIR}/wayland_xdg_shell.h
     wayland-scanner private-code  ${XDG_SHELL_XML} ${GEN_DIR}/wayland_xdg_shell.c
+
+    # also copy over converted image files
+    cp ${WORKDIR}/AM62L_Front.c ${S}/
+    cp ${WORKDIR}/AM62L_Back.c ${S}/
 }
 
 do_configure:append() {
