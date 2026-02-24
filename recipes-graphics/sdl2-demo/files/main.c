@@ -228,15 +228,15 @@ int main(int argc, char **argv) {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, my_model[i].num_indices * sizeof(GLuint), my_model[i].indices, GL_STATIC_DRAW);
     }
 
-    float rot_x = 0.0f, rot_y = 0.0f;
+    Mat4 model_orientation = identity();
     int running = 1;
 
     float zoom_z = -7.0f;
 
-    Uint32 last_interaction_time = SDL_GetTicks();
+    Uint64 last_interaction_time = SDL_GetTicks64();
     int is_auto_rotating = 0;
 
-    Uint32 last_fps_print = SDL_GetTicks();
+    Uint64 last_fps_print = SDL_GetTicks64();
     int frame_count = 0;
 
     /* 6. Render Loop */
@@ -245,17 +245,17 @@ int main(int argc, char **argv) {
         while(SDL_PollEvent(&e)) {
             if(e.type == SDL_QUIT) running = 0;
             else if(e.type == SDL_FINGERMOTION) {
-                rot_y -= e.tfinger.dx * 5.0f;
-                rot_x -= e.tfinger.dy * 5.0f;
+                model_orientation = multiply(model_orientation, rotate_y(-e.tfinger.dx * 5.0f));
+                model_orientation = multiply(model_orientation, rotate_x(-e.tfinger.dy * 5.0f));
 		//printf("[DEBUG] Finger Press!");
-                last_interaction_time = SDL_GetTicks();
+                last_interaction_time = SDL_GetTicks64();
                 is_auto_rotating = 0;
             }
             else if(e.type == SDL_MOUSEMOTION && (e.motion.state & SDL_BUTTON_LMASK)) {
-                rot_y += e.motion.yrel * 0.01f;
-                rot_x += e.motion.xrel * 0.01f;
+                model_orientation = multiply(model_orientation, rotate_y(e.motion.xrel * 0.01f));
+                model_orientation = multiply(model_orientation, rotate_x(e.motion.yrel * 0.01f));
 		//printf("[DEBUG] Mouse Press!");
-                last_interaction_time = SDL_GetTicks();
+                last_interaction_time = SDL_GetTicks64();
                 is_auto_rotating = 0;
             }
 	    else if(e.type == SDL_MULTIGESTURE) {
@@ -263,19 +263,19 @@ int main(int argc, char **argv) {
                 zoom_z += e.mgesture.dDist * 20.0f;
                 if (zoom_z > -2.0f) zoom_z = -2.0f; // Don't clip through the camera
                 if (zoom_z < -20.0f) zoom_z = -20.0f; // Don't disappear
-                last_interaction_time = SDL_GetTicks();
+                last_interaction_time = SDL_GetTicks64();
                 is_auto_rotating = 0;
             }
         }
 
 	/* Check for 10 seconds of inactivity (10000 ms) */
-        Uint32 current_time = SDL_GetTicks();
+        Uint64 current_time = SDL_GetTicks64();
         if (current_time - last_interaction_time > 10000) {
             is_auto_rotating = 1;
         }
 
         if (is_auto_rotating) {
-            rot_y += 0.01f; // Adjust this for spin speed
+            model_orientation = multiply(model_orientation, rotate_y(0.01f));
         }
 
         /* 1. Get Actual Window Size (MOVED TO TOP) */
@@ -297,7 +297,7 @@ int main(int argc, char **argv) {
         Mat4 proj = perspective(1.0f, (float)w/h, 0.1f, 100.0f);
 
         /* 3. Create Model Matrix */
-        Mat4 model = multiply(rotate_x(rot_x), rotate_y(rot_y));
+	Mat4 model = model_orientation;
 
         /* 4. SCALE: Shrink by 10x */
         Mat4 scale_mat = identity(); 
@@ -351,7 +351,7 @@ int main(int argc, char **argv) {
         glUseProgram(prog); // Switch back to 3D shader
 
         frame_count++;
-        Uint32 now = SDL_GetTicks();
+        Uint64 now = SDL_GetTicks64();
         if (now - last_fps_print >= 1000) {
 	    update_fps_texture(fps_tex, frame_count);
             //printf("[FPS] %d | Objects: %d\n", frame_count, num_objects);
