@@ -1,0 +1,173 @@
+From 695323d18ff4bec401a2a7ccf5b28ab0cd166878 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Wed, 25 Feb 2026 18:48:19 +0000
+Subject: [PATCH] lvgl v9.1: add two finger touch support
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ src/drivers/wayland/lv_wayland.c | 66 +++++++++++++++++++-------------
+ 1 file changed, 39 insertions(+), 27 deletions(-)
+
+diff --git a/src/drivers/wayland/lv_wayland.c b/src/drivers/wayland/lv_wayland.c
+index dc71f6677..3d72811a7 100644
+--- a/src/drivers/wayland/lv_wayland.c
++++ b/src/drivers/wayland/lv_wayland.c
+@@ -118,9 +118,9 @@ struct input {
+     } keyboard;
+ 
+     struct {
+-        uint32_t x;
+-        uint32_t y;
+-        lv_indev_state_t state;
++        uint32_t x[2];
++        uint32_t y[2];
++        lv_indev_state_t state[2];
+     } touch;
+ };
+ 
+@@ -199,7 +199,7 @@ struct window {
+ 
+     lv_indev_t * lv_indev_pointer;
+     lv_indev_t * lv_indev_pointeraxis;
+-    lv_indev_t * lv_indev_touch;
++    lv_indev_t * lv_indev_touch[2];
+     lv_indev_t * lv_indev_keyboard;
+ 
+     lv_wayland_display_close_f_t close_cb;
+@@ -884,7 +884,6 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch,
+ {
+     struct application * app = data;
+ 
+-    LV_UNUSED(id);
+     LV_UNUSED(time);
+     LV_UNUSED(serial);
+     LV_UNUSED(wl_touch);
+@@ -896,9 +895,11 @@ static void touch_handle_down(void * data, struct wl_touch * wl_touch,
+ 
+     app->touch_obj = wl_surface_get_user_data(surface);
+ 
+-    app->touch_obj->input.touch.x = wl_fixed_to_int(x_w);
+-    app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
+-    app->touch_obj->input.touch.state = LV_INDEV_STATE_PRESSED;
++    if(id < 2) {
++        app->touch_obj->input.touch.x[id] = wl_fixed_to_int(x_w);
++        app->touch_obj->input.touch.y[id] = wl_fixed_to_int(y_w);
++        app->touch_obj->input.touch.state[id] = LV_INDEV_STATE_PRESSED;
++    }
+ 
+ #if LV_WAYLAND_WINDOW_DECORATIONS
+     struct window * window = app->touch_obj->window;
+@@ -930,14 +931,15 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
+ 
+     LV_UNUSED(serial);
+     LV_UNUSED(time);
+-    LV_UNUSED(id);
+     LV_UNUSED(wl_touch);
+ 
+     if(!app->touch_obj) {
+         return;
+     }
+ 
+-    app->touch_obj->input.touch.state = LV_INDEV_STATE_RELEASED;
++    if(id < 2) {
++        app->touch_obj->input.touch.state[id] = LV_INDEV_STATE_RELEASED;
++    }
+ 
+ #if LV_WAYLAND_WINDOW_DECORATIONS
+     struct window * window = app->touch_obj->window;
+@@ -968,7 +970,10 @@ static void touch_handle_up(void * data, struct wl_touch * wl_touch,
+     }
+ #endif // LV_WAYLAND_WINDOW_DECORATIONS
+ 
+-    app->touch_obj = NULL;
++    if(app->touch_obj->input.touch.state[0] == LV_INDEV_STATE_RELEASED &&
++        app->touch_obj->input.touch.state[1] == LV_INDEV_STATE_RELEASED) {
++        app->touch_obj = NULL;
++    }
+ }
+ 
+ static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
+@@ -977,15 +982,16 @@ static void touch_handle_motion(void * data, struct wl_touch * wl_touch,
+     struct application * app = data;
+ 
+     LV_UNUSED(time);
+-    LV_UNUSED(id);
+     LV_UNUSED(wl_touch);
+ 
+     if(!app->touch_obj) {
+         return;
+     }
+ 
+-    app->touch_obj->input.touch.x = wl_fixed_to_int(x_w);
+-    app->touch_obj->input.touch.y = wl_fixed_to_int(y_w);
++    if(id < 2) {
++        app->touch_obj->input.touch.x[id] = wl_fixed_to_int(x_w);
++        app->touch_obj->input.touch.y[id] = wl_fixed_to_int(y_w);
++    }
+ }
+ 
+ static void touch_handle_frame(void * data, struct wl_touch * wl_touch)
+@@ -2249,9 +2255,12 @@ static void _lv_wayland_handle_output(void)
+             window->shall_close = false;
+             shall_flush = true;
+ 
+-            window->body->input.touch.x = 0;
+-            window->body->input.touch.y = 0;
+-            window->body->input.touch.state = LV_INDEV_STATE_RELEASED;
++	    for(int i = 0; i < 2; i++) {
++                window->body->input.touch.x[i] = 0;
++                window->body->input.touch.y[i] = 0;
++                window->body->input.touch.state[i] = LV_INDEV_STATE_RELEASED;
++           }
++
+             if(window->application->touch_obj == window->body) {
+                 window->application->touch_obj = NULL;
+             }
+@@ -2338,9 +2347,10 @@ static void _lv_wayland_touch_read(lv_indev_t * drv, lv_indev_data_t * data)
+         return;
+     }
+ 
+-    data->point.x = window->body->input.touch.x;
+-    data->point.y = window->body->input.touch.y;
+-    data->state = window->body->input.touch.state;
++    int id = (drv == window->lv_indev_touch[0]) ? 0 : 1;
++    data->point.x = window->body->input.touch.x[id];
++    data->point.y = window->body->input.touch.y[id];
++    data->state = window->body->input.touch.state[id];
+ }
+ 
+ /**********************
+@@ -2569,13 +2579,15 @@ lv_display_t * lv_wayland_window_create(uint32_t hor_res, uint32_t ver_res, char
+         LV_LOG_ERROR("failed to register pointeraxis indev");
+     }
+ 
+-    window->lv_indev_touch = lv_indev_create();
+-    lv_indev_set_type(window->lv_indev_touch, LV_INDEV_TYPE_POINTER);
+-    lv_indev_set_read_cb(window->lv_indev_touch, _lv_wayland_touch_read);
+-    lv_indev_set_display(window->lv_indev_touch, window->lv_disp);
++    for(int i = 0; i < 2; i++) {
++        window->lv_indev_touch[i] = lv_indev_create();
++        lv_indev_set_type(window->lv_indev_touch[i], LV_INDEV_TYPE_POINTER);
++        lv_indev_set_read_cb(window->lv_indev_touch[i], _lv_wayland_touch_read);
++        lv_indev_set_display(window->lv_indev_touch[i], window->lv_disp);
+ 
+-    if(!window->lv_indev_touch) {
+-        LV_LOG_ERROR("failed to register touch indev");
++        if(!window->lv_indev_touch[i]) {
++            LV_LOG_ERROR("failed to register touch indev %d", i);
++        }
+     }
+ 
+     window->lv_indev_keyboard = lv_indev_create();
+@@ -2778,7 +2790,7 @@ lv_indev_t * lv_wayland_get_touchscreen(lv_display_t * disp)
+     if(!window) {
+         return NULL;
+     }
+-    return window->lv_indev_touch;
++    return window->lv_indev_touch[0];
+ }
+ 
+ /**
+-- 
+2.34.1
+

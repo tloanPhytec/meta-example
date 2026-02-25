@@ -1,0 +1,118 @@
+From b962372f494624faa5a3ff95947a5f6e47fa3c4e Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Wed, 25 Feb 2026 22:43:14 +0000
+Subject: [PATCH 4/4] wip demo: added screensaver mode on idle
+
+- also quited a warning about implicit type conversions
+- also improved overall framerate to 60fps
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ main.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index e2854aa..391defd 100644
+--- a/main.c
++++ b/main.c
+@@ -12,6 +12,8 @@ LV_IMAGE_DECLARE(flip_icon);
+ /* -------------------------------------------------------------------------- */
+ /* FPS HUD Data & Logic                                                       */
+ /* -------------------------------------------------------------------------- */
++static uint32_t last_activity_time = 0;
++
+ const unsigned char font8x8[14][8] = {
+     {0x3E,0x61,0x61,0x61,0x61,0x61,0x3E,0x00}, // 0
+     {0x18,0x08,0x08,0x08,0x08,0x08,0x08,0x00}, // 1
+@@ -55,7 +57,7 @@ static int get_font_idx(char c) {
+ 
+ static void update_fps_hud(uint32_t fps) {
+     char str[16];
+-    snprintf(str, sizeof(str), "FPS %-3lu", fps);
++    snprintf(str, sizeof(str), "FPS %-3u", fps);
+     uint32_t fg = 0xFF000000; /* Solid Black */
+     uint32_t bg = 0x00000000; /* 100% Transparent */
+ 
+@@ -108,6 +110,7 @@ static void img_event_cb(lv_event_t * e)
+     lv_indev_t * indev = lv_indev_active();
+ 
+     if(code == LV_EVENT_PRESSING) {
++        last_activity_time = lv_tick_get();
+         lv_indev_t * indev1 = NULL;
+         lv_indev_t * indev2 = NULL;
+         lv_indev_t * curr = lv_indev_get_next(NULL);
+@@ -189,6 +192,7 @@ static void img_event_cb(lv_event_t * e)
+         }
+     } else if(code == LV_EVENT_RELEASED) {
+         start_dist = 0;
++        last_activity_time = lv_tick_get();
+     }
+ }
+ 
+@@ -204,6 +208,53 @@ static void flip_btn_event_cb(lv_event_t * e)
+     lv_image_set_src(main_img, is_front ? &AM62L_Front : &AM62L_Back);
+ }
+ 
++/* -------------------------------------------------------------------------- */
++/* Screensaver Logic                                                          */
++/* -------------------------------------------------------------------------- */
++static void screensaver_timer_cb(lv_timer_t * t)
++{
++    uint32_t current_time = lv_tick_get();
++    if((current_time - last_activity_time) > 10000) {
++	lv_obj_t * img = lv_timer_get_user_data(t);
++        static int32_t vel_x = 3;
++        static int32_t vel_y = 3;
++
++        int32_t x = lv_obj_get_x(img);
++        int32_t y = lv_obj_get_y(img);
++
++        x += vel_x;
++        y += vel_y;
++
++        int32_t scr_w = lv_obj_get_width(lv_screen_active());
++        int32_t scr_h = lv_obj_get_height(lv_screen_active());
++        int32_t img_w = lv_obj_get_width(img);
++        int32_t img_h = lv_obj_get_height(img);
++
++        int32_t scale = lv_image_get_scale(img);
++        int32_t scaled_w = (img_w * scale) / 256;
++        int32_t scaled_h = (img_h * scale) / 256;
++
++        int32_t offset_x = (scaled_w - img_w) / 2;
++        int32_t offset_y = (scaled_h - img_h) / 2;
++
++        int32_t min_x = offset_x;
++        int32_t max_x = scr_w - scaled_w + offset_x;
++        if(scaled_w > scr_w) { min_x = scr_w - scaled_w + offset_x; max_x = offset_x; }
++
++        int32_t min_y = offset_y;
++        int32_t max_y = scr_h - scaled_h + offset_y;
++        if(scaled_h > scr_h) { min_y = scr_h - scaled_h + offset_y; max_y = offset_y; }
++
++        if(x <= min_x) { x = min_x; vel_x = -vel_x; }
++        else if(x >= max_x) { x = max_x; vel_x = -vel_x; }
++
++        if(y <= min_y) { y = min_y; vel_y = -vel_y; }
++        else if(y >= max_y) { y = max_y; vel_y = -vel_y; }
++
++        lv_obj_set_pos(img, x, y);
++    }
++}
++
+ /* -------------------------------------------------------------------------- */
+ /* UI Setup                                                                   */
+ /* -------------------------------------------------------------------------- */
+@@ -251,6 +302,9 @@ void ui_create_image_viewer(lv_indev_t * indev)
+ 
+     lv_display_add_event_cb(lv_display_get_default(), refr_event_cb, LV_EVENT_REFR_READY, NULL);
+     lv_timer_create(fps_timer_cb, 1000, NULL);
++
++    /* 7. Create Screensaver Timer (~60 FPS) */
++    lv_timer_create(screensaver_timer_cb, 16, img);
+ }
+ 
+ void force_screen_clear(void)
+-- 
+2.34.1
+

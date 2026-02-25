@@ -9,8 +9,14 @@ SRC_URI = " \
 	git://github.com/lvgl/lv_port_linux.git;protocol=https;branch=master;name=demo \
 	git://github.com/lvgl/lvgl;protocol=https;branch=release/v9.2;name=lvgl;subdir=git/lvgl \
 	file://0001-2D-Image-Viewer-Demo-using-Weston.patch \
+	file://0002-wip-am62l-2D-demo-add-two-finger-touch-support.patch \
+	file://0003-wip-am62l-2D-demo-add-flip-button-support-and-FPS-HU.patch \
+	file://0004-wip-demo-added-screensaver-mode-on-idle.patch \
+	file://0001-lvgl-v9.1-add-two-finger-touch-support.patch;patchdir=lvgl \
+	FILE://0002-lvgl-v9.1-fix-weston-frame-deadlock.patch;patchdir=lvgl \
 	file://AM62L_Front.c \
 	file://AM62L_Back.c \
+	file://flip_icon.c \
 "
 
 # v9.2.2 exact release hashes
@@ -41,6 +47,7 @@ LVGL_CONFIG_LV_COLOR_DEPTH = "32"
 LVGL_CONFIG_LV_USE_ASSERT_MEM_INTEGRITY = "0"
 LVGL_CONFIG_LV_USE_ASSERT_OBJ = "0"
 LVGL_CONFIG_LV_LOG_TRACE_MEM = "0"
+LVGL_CONFIG_LV_DEF_REFR_PERIOD = "16"
 
 LVGL_CONFIG_USE_MATRIX = "1"
 LVGL_CONFIG_LV_USE_DRAW_VG_LITE = "0"
@@ -75,6 +82,7 @@ do_configure:prepend() {
     # also copy over converted image files
     cp ${WORKDIR}/AM62L_Front.c ${S}/
     cp ${WORKDIR}/AM62L_Back.c ${S}/
+    cp ${WORKDIR}/flip_icon.c ${S}/
 }
 
 do_configure:append() {
@@ -95,6 +103,7 @@ do_configure:append() {
 	-e "s|^([[:space:]]*#define LV_USE_ASSERT_MEM_INTEGRITY[[:space:]]).*|\1${LVGL_CONFIG_LV_USE_ASSERT_MEM_INTEGRITY}|" \
 	-e "s|^([[:space:]]*#define LV_USE_ASSERT_OBJ[[:space:]]).*|\1${LVGL_CONFIG_LV_USE_ASSERT_OBJ}|" \
 	-e "s|^([[:space:]]*#define LV_LOG_TRACE_MEM[[:space:]]).*|\1${LVGL_CONFIG_LV_LOG_TRACE_MEM}|" \
+	-e "s|^([[:space:]]*#define LV_DEF_REFR_PERIOD[[:space:]]).*|\1${LVGL_CONFIG_LV_DEF_REFR_PERIOD}|" \
         \
         -i "${S}/lv_conf.h"
 
