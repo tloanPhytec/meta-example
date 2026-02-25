@@ -8,6 +8,7 @@ SRC_URI = " \
 	file://main.c \
 	file://model_data.h \
 	file://am62p-3d-demo.service \
+	file://back-icon.bmp \
 "
 	
 S = "${WORKDIR}"
@@ -30,8 +31,10 @@ do_install() {
     install -m 0755 am62p-3d-demo ${D}${bindir}
 
     install -Dm 0644 ${WORKDIR}/am62p-3d-demo.service ${D}${systemd_system_unitdir}/am62p-3d-demo.service
+    install -Dm 0644 ${WORKDIR}/back-icon.bmp ${D}${datadir}/${PN}/back-icon.bmp
 }
 
-FILES:${PN} += "${systemd_unitdir}"
+FILES:${PN} += "${systemd_unitdir}/am62p-3d-demo.service"
+FILES:${PN} += "${datadir}/${PN}/my_image.bmp"
 
 COMPATIBLE_MACHINE .= "|phyboard-lynx-am62pxx-1"

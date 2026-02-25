@@ -9,6 +9,10 @@
 /* --- Configuration --- */
 #define WIN_WIDTH  1920
 #define WIN_HEIGHT 1200
+const float BTN_HI_X = 0.98f;
+const float BTN_LO_X = 0.82f;
+const float BTN_HI_Y = 0.97f;
+const float BTN_LO_Y = 0.81f;
 
 /* --- Shaders --- */
 const char *vertex_src =
@@ -47,6 +51,14 @@ const char *hud_fs =
     "    vec4 color = texture2D(u_tex, v_uv); \n"
     "    if(color.r < 0.1) discard; \n" // Make background transparent
     "    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); \n" // Black HUD text
+    "} \n";
+
+const char *image_fs =
+    "precision mediump float; \n"
+    "varying vec2 v_uv; \n"
+    "uniform sampler2D u_tex; \n"
+    "void main() { \n"
+    "    gl_FragColor = texture2D(u_tex, v_uv); \n"
     "} \n";
 
 /* --- Simple 8x8 Font Data for 0-9 and 'FPS: ' --- */
@@ -207,6 +219,28 @@ int main(int argc, char **argv) {
     glAttachShader(hud_prog, hvs); glAttachShader(hud_prog, hfs);
     glLinkProgram(hud_prog);
 
+    /* Setup Static Image Shader */
+    GLuint ifs = compile_shader(GL_FRAGMENT_SHADER, image_fs);
+    GLuint img_prog = glCreateProgram();
+    glAttachShader(img_prog, hvs);
+    glAttachShader(img_prog, ifs);
+    glLinkProgram(img_prog);
+
+    /* Load BMP Image to GPU */
+    GLuint static_img_tex = 0;
+    SDL_Surface* img_surf = SDL_LoadBMP("/usr/share/sdl2-am62p-ew-3d-demo/back-icon.bmp");
+    if (img_surf) {
+        glGenTextures(1, &static_img_tex);
+        glBindTexture(GL_TEXTURE_2D, static_img_tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        GLenum format = (img_surf->format->BytesPerPixel == 4) ? GL_RGBA : GL_RGB;
+        glTexImage2D(GL_TEXTURE_2D, 0, format, img_surf->w, img_surf->h, 0, format, GL_UNSIGNED_BYTE, img_surf->pixels);
+        SDL_FreeSurface(img_surf);
+    } else {
+        printf("[WARNING] Failed to load my_image.bmp: %s\n", SDL_GetError());
+    }
+
     GLint u_matrix = glGetUniformLocation(prog, "u_matrix");
 
     /* Setup FPS Overlay Texture */
@@ -243,7 +277,20 @@ int main(int argc, char **argv) {
     while(running) {
         SDL_Event e;
         while(SDL_PollEvent(&e)) {
-            if(e.type == SDL_QUIT) running = 0;
+	    if(e.type == SDL_QUIT) running = 0;
+	    else if(e.type == SDL_FINGERDOWN) {
+                // Convert OpenGL drawing coordinates to SDL touch coordinates
+                float touch_min_x = (BTN_LO_X + 1.0f) / 2.0f;
+                float touch_max_x = (BTN_HI_X + 1.0f) / 2.0f;
+                float touch_min_y = (1.0f - BTN_HI_Y) / 2.0f; // Y-axis is inverted
+                float touch_max_y = (1.0f - BTN_LO_Y) / 2.0f;
+
+                if (e.tfinger.x >= touch_min_x && e.tfinger.x <= touch_max_x &&
+                    e.tfinger.y >= touch_min_y && e.tfinger.y <= touch_max_y) {
+                    // printf("[DEBUG] Close Button Pressed! Exiting...\n");
+                    running = 0;
+                }
+            }
             else if(e.type == SDL_FINGERMOTION) {
                 model_orientation = multiply(model_orientation, rotate_y(-e.tfinger.dx * 5.0f));
                 model_orientation = multiply(model_orientation, rotate_x(-e.tfinger.dy * 5.0f));
@@ -251,18 +298,11 @@ int main(int argc, char **argv) {
                 last_interaction_time = SDL_GetTicks64();
                 is_auto_rotating = 0;
             }
-            else if(e.type == SDL_MOUSEMOTION && (e.motion.state & SDL_BUTTON_LMASK)) {
-                model_orientation = multiply(model_orientation, rotate_y(e.motion.xrel * 0.01f));
-                model_orientation = multiply(model_orientation, rotate_x(e.motion.yrel * 0.01f));
-		//printf("[DEBUG] Mouse Press!");
-                last_interaction_time = SDL_GetTicks64();
-                is_auto_rotating = 0;
-            }
 	    else if(e.type == SDL_MULTIGESTURE) {
                 // dDist is positive for pinching out, negative for pinching in
                 zoom_z += e.mgesture.dDist * 20.0f;
                 if (zoom_z > -2.0f) zoom_z = -2.0f; // Don't clip through the camera
-                if (zoom_z < -20.0f) zoom_z = -20.0f; // Don't disappear
+                if (zoom_z < -15.0f) zoom_z = -15.0f; // Don't disappear
                 last_interaction_time = SDL_GetTicks64();
                 is_auto_rotating = 0;
             }
@@ -348,6 +388,26 @@ int main(int argc, char **argv) {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), &hud_verts[2]);
         glEnableVertexAttribArray(0); glEnableVertexAttribArray(1);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	/* --- DRAW STATIC IMAGE --- */
+        if (static_img_tex) {
+            glUseProgram(img_prog);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glBindTexture(GL_TEXTURE_2D, static_img_tex);
+
+            float img_verts[] = {
+                 BTN_LO_X, BTN_HI_Y, 0.0f, 0.0f,
+                 BTN_HI_X, BTN_HI_Y, 1.0f, 0.0f,
+                 BTN_LO_X, BTN_LO_X, 0.0f, 1.0f,
+                 BTN_HI_X, BTN_LO_X, 1.0f, 1.0f
+            };
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), img_verts);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4*sizeof(float), &img_verts[2]);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glDisable(GL_BLEND);
+        }
+
         glUseProgram(prog); // Switch back to 3D shader
 
         frame_count++;
