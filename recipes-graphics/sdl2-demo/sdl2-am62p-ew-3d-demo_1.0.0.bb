@@ -29,5 +29,3 @@ do_install() {
 }
 
 FILES:${PN} += "${datadir}/${PN}/my_image.bmp"
-
-COMPATIBLE_MACHINE .= "|phyboard-lynx-am62pxx-1"
