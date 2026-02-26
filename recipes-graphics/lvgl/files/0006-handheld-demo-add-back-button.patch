@@ -1,0 +1,78 @@
+From 5f56db800dc50d9bfc2328e550aa07c2459baf0f Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Thu, 26 Feb 2026 00:58:02 +0000
+Subject: [PATCH 6/6] handheld demo: add back button
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ CMakeLists.txt |  2 +-
+ main.c         | 19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fd2fc33..ce1f780 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,7 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+ add_subdirectory(lvgl)
+ target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/lvgl/src/drivers/wayland)
+ 
+-add_executable(main main.c mouse_cursor_icon.c lvgl/src/drivers/wayland/lv_wayland.c lvgl/src/drivers/wayland/lv_wayland_smm.c lvgl/src/drivers/wayland/wayland_xdg_shell.c AM62L_Back.c AM62L_Front.c flip_icon.c)
++add_executable(main main.c mouse_cursor_icon.c lvgl/src/drivers/wayland/lv_wayland.c lvgl/src/drivers/wayland/lv_wayland_smm.c lvgl/src/drivers/wayland/wayland_xdg_shell.c AM62L_Back.c AM62L_Front.c flip_icon.c back_icon.c)
+ 
+ target_link_libraries(main lvgl lvgl::examples lvgl::demos lvgl::thorvg ${SDL2_LIBRARIES} wayland-client wayland-cursor xkbcommon m pthread)
+ add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/main DEPENDS main)
+diff --git a/main.c b/main.c
+index ab53f4e..14e11b8 100644
+--- a/main.c
++++ b/main.c
+@@ -8,6 +8,7 @@
+ LV_IMAGE_DECLARE(AM62L_Front);
+ LV_IMAGE_DECLARE(AM62L_Back);
+ LV_IMAGE_DECLARE(flip_icon);
++LV_IMAGE_DECLARE(back_icon);
+ 
+ /* -------------------------------------------------------------------------- */
+ /* FPS HUD Data & Logic                                                       */
+@@ -208,6 +209,15 @@ static void flip_btn_event_cb(lv_event_t * e)
+     lv_image_set_src(main_img, is_front ? &AM62L_Front : &AM62L_Back);
+ }
+ 
++/* -------------------------------------------------------------------------- */
++/* Back Button Handler                                                  */
++/* -------------------------------------------------------------------------- */
++static void back_btn_event_cb(lv_event_t * e)
++{
++    lv_display_t * disp = lv_obj_get_display(lv_event_get_target(e));
++    lv_wayland_window_close(disp);
++}
++
+ /* -------------------------------------------------------------------------- */
+ /* Screensaver Logic                                                          */
+ /* -------------------------------------------------------------------------- */
+@@ -292,6 +302,13 @@ void ui_create_image_viewer(lv_indev_t * indev)
+     lv_obj_add_flag(flip_btn, LV_OBJ_FLAG_CLICKABLE);
+     lv_obj_add_event_cb(flip_btn, flip_btn_event_cb, LV_EVENT_CLICKED, img);
+ 
++    /* Create Back Button */
++    lv_obj_t * back_btn = lv_image_create(scr);
++    lv_image_set_src(back_btn, &back_icon);
++    lv_obj_align(back_btn, LV_ALIGN_TOP_RIGHT, -20, 20);
++    lv_obj_add_flag(back_btn, LV_OBJ_FLAG_CLICKABLE);
++    lv_obj_add_event_cb(back_btn, back_btn_event_cb, LV_EVENT_CLICKED, img);
++
+     /* 6. Create FPS HUD */
+     fps_img_obj = lv_image_create(scr);
+     lv_image_set_src(fps_img_obj, &fps_img_dsc);
+@@ -346,7 +363,7 @@ int main(void)
+     ui_create_image_viewer(indev);
+ 
+     /* 3. Handle LVGL tasks */
+-    while(1) {
++    while(lv_wayland_window_is_open(disp)) {
+ 	lv_wayland_timer_handler();
+         uint32_t ms = lv_timer_handler();
+         usleep(ms * 1000);
+-- 
+2.34.1
+

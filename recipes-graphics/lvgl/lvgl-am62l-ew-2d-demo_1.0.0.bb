@@ -13,6 +13,7 @@ SRC_URI = " \
 	file://0003-wip-am62l-2D-demo-add-flip-button-support-and-FPS-HU.patch \
 	file://0004-wip-demo-added-screensaver-mode-on-idle.patch \
 	file://0005-demo-bug-fix.patch \
+	file://0006-handheld-demo-add-back-button.patch \
 	file://0001-lvgl-v9.1-add-two-finger-touch-support.patch;patchdir=lvgl \
 	file://0002-lvgl-v9.1-fix-weston-frame-deadlock.patch;patchdir=lvgl \
 	file://AM62L_Front.c \
