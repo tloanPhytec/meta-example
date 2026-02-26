@@ -1,0 +1,42 @@
+From 62eeb72adfee58197027533de4fbabef44d138a6 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Thu, 26 Feb 2026 01:31:42 +0000
+Subject: [PATCH 7/7] fix: allows the close button to actually work
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index 14e11b8..26e28e2 100644
+--- a/main.c
++++ b/main.c
+@@ -14,6 +14,7 @@ LV_IMAGE_DECLARE(back_icon);
+ /* FPS HUD Data & Logic                                                       */
+ /* -------------------------------------------------------------------------- */
+ static uint32_t last_activity_time = 0;
++static bool app_running = true;
+ 
+ const unsigned char font8x8[14][8] = {
+     {0x3E,0x61,0x61,0x61,0x61,0x61,0x3E,0x00}, // 0
+@@ -216,6 +217,7 @@ static void back_btn_event_cb(lv_event_t * e)
+ {
+     lv_display_t * disp = lv_obj_get_display(lv_event_get_target(e));
+     lv_wayland_window_close(disp);
++    app_running = false;
+ }
+ 
+ /* -------------------------------------------------------------------------- */
+@@ -363,7 +365,7 @@ int main(void)
+     ui_create_image_viewer(indev);
+ 
+     /* 3. Handle LVGL tasks */
+-    while(lv_wayland_window_is_open(disp)) {
++    while(app_running) {
+ 	lv_wayland_timer_handler();
+         uint32_t ms = lv_timer_handler();
+         usleep(ms * 1000);
+-- 
+2.34.1
+
