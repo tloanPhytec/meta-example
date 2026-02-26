@@ -1,0 +1,27 @@
+From 0b9339ea60c08149b5a4c5c855e57cef9d3910c7 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Wed, 25 Feb 2026 23:06:32 +0000
+Subject: [PATCH 5/5] demo: bug fix
+
+- set initial last_activity_time so that the screen saver mode doesn't start right away
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/main.c b/main.c
+index 391defd..ab53f4e 100644
+--- a/main.c
++++ b/main.c
+@@ -302,6 +302,7 @@ void ui_create_image_viewer(lv_indev_t * indev)
+ 
+     lv_display_add_event_cb(lv_display_get_default(), refr_event_cb, LV_EVENT_REFR_READY, NULL);
+     lv_timer_create(fps_timer_cb, 1000, NULL);
++    last_activity_time = lv_tick_get();
+ 
+     /* 7. Create Screensaver Timer (~60 FPS) */
+     lv_timer_create(screensaver_timer_cb, 16, img);
+-- 
+2.34.1
+

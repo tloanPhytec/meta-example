@@ -12,11 +12,14 @@ SRC_URI = " \
 	file://0002-wip-am62l-2D-demo-add-two-finger-touch-support.patch \
 	file://0003-wip-am62l-2D-demo-add-flip-button-support-and-FPS-HU.patch \
 	file://0004-wip-demo-added-screensaver-mode-on-idle.patch \
+	file://0005-demo-bug-fix.patch \
 	file://0001-lvgl-v9.1-add-two-finger-touch-support.patch;patchdir=lvgl \
-	FILE://0002-lvgl-v9.1-fix-weston-frame-deadlock.patch;patchdir=lvgl \
+	file://0002-lvgl-v9.1-fix-weston-frame-deadlock.patch;patchdir=lvgl \
 	file://AM62L_Front.c \
 	file://AM62L_Back.c \
 	file://flip_icon.c \
+	file://back_icon.c \
+	file://am62l-2d-demo.service \
 "
 
 # v9.2.2 exact release hashes
@@ -26,7 +29,7 @@ SRCREV_FORMAT = "lvgl_demo"
 
 S = "${WORKDIR}/git"
 
-inherit cmake pkgconfig
+inherit cmake pkgconfig systemd
 
 DEPENDS += "wayland wayland-native wayland-protocols libxkbcommon"
 
@@ -83,6 +86,7 @@ do_configure:prepend() {
     cp ${WORKDIR}/AM62L_Front.c ${S}/
     cp ${WORKDIR}/AM62L_Back.c ${S}/
     cp ${WORKDIR}/flip_icon.c ${S}/
+    cp ${WORKDIR}/back_icon.c ${S}/
 }
 
 do_configure:append() {
@@ -123,4 +127,10 @@ do_configure:append() {
 do_install() {
 	install -d ${D}${bindir}
 	install -m 0755 ${S}/bin/main ${D}${bindir}/lvgl
+
+	install -Dm 0644 ${WORKDIR}/am62l-2d-demo.service ${D}${systemd_system_unitdir}/am62l-2d-demo.service
 }
+
+FILES:${PN} += "${systemd_unitdir}"
+
+SYSTEMD_SERVICE:${PN} = "am62l-2d-demo.service"
