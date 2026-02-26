@@ -20,7 +20,6 @@ SRC_URI = " \
 	file://AM62L_Back.c \
 	file://flip_icon.c \
 	file://back_icon.c \
-	file://am62l-2d-demo.service \
 "
 
 # v9.2.2 exact release hashes
@@ -30,7 +29,7 @@ SRCREV_FORMAT = "lvgl_demo"
 
 S = "${WORKDIR}/git"
 
-inherit cmake pkgconfig systemd
+inherit cmake pkgconfig
 
 DEPENDS += "wayland wayland-native wayland-protocols libxkbcommon"
 
@@ -128,10 +127,4 @@ do_configure:append() {
 do_install() {
 	install -d ${D}${bindir}
 	install -m 0755 ${S}/bin/main ${D}${bindir}/lvgl
-
-	install -Dm 0644 ${WORKDIR}/am62l-2d-demo.service ${D}${systemd_system_unitdir}/am62l-2d-demo.service
 }
-
-FILES:${PN} += "${systemd_unitdir}"
-
-SYSTEMD_SERVICE:${PN} = "am62l-2d-demo.service"
