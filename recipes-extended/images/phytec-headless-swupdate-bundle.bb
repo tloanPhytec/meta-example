@@ -7,7 +7,9 @@ inherit swupdate
 
 SRC_URI = " \
     file://sw-description \
+    file://update.sh \
 "
-IMAGE_DEPENDS = "phytec-headless-image"
-SWUPDATE_IMAGES = "phytec-headless-image-phyboard-pollux-imx8mp-3.rootfs"
+IMAGE_DEPENDS = "phytec-headless-image virtual/kernel"
+SWUPDATE_IMAGES = "phytec-headless-image-phyboard-pollux-imx8mp-3.rootfs fitImage"
 SWUPDATE_IMAGES_FSTYPES[phytec-headless-image-phyboard-pollux-imx8mp-3.rootfs] = ".ext4"
+SWUPDATE_IMAGES_FSTYPES[fitImage] = ""

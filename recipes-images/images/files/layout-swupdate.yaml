@@ -1,0 +1,57 @@
+api-version: 1
+disklabel: msdos
+
+mmc:
+  boot-partitions:
+    enable: 1
+    binaries:
+      - input-offset: 0kiB
+        output-offset: ${BOOTLOADER_SEEK_EMMC}kiB
+        input:
+          filename: ${BOOTLOADER_FILE}
+
+raw:
+  - input-offset: ${BOOTLOADER_SKIP}kiB
+    output-offset: ${BOOTLOADER_SEEK}kiB
+    input:
+      filename: ${BOOTLOADER_FILE}
+
+# BEGIN_CLEAN
+clean:
+  - offset: ${UBOOT_ENV_OFFSET}
+    size: 64kiB
+  - offset: ${UBOOT_ENV_OFFSET_REDUND}
+    size: 64kiB
+# END_CLEAN
+
+partitions:
+  - label: boot0
+    type: primary
+    filesystem: fat32
+    size: 128MiB
+    offset: ${BOOT_PART_OFFSET}
+    input: # ARRAY_IMAGE_BOOT_FILES
+      - filename: @KEY@ # ARRAY_IMAGE_BOOT_FILES
+
+  - label: boot1
+    type: primary
+    filesystem: fat32
+    size: 128MiB
+    input: # ARRAY_IMAGE_BOOT_FILES
+      - filename: @KEY@ # ARRAY_IMAGE_BOOT_FILES
+
+  - label: root0
+    type: logical
+    filesystem: ${PARTUP_ROOT_FS}
+    expand: true
+    block-size: 4kiB
+    input:
+      - filename: ${IMAGE_LINK_NAME}.${PARTUP_ROOTFS_IMAGE_EXT}
+
+  - label: root1
+    type: logical
+    filesystem: ${PARTUP_ROOT_FS}
+    expand: true
+    block-size: 4kiB
+    input:
+      - filename: ${IMAGE_LINK_NAME}.${PARTUP_ROOTFS_IMAGE_EXT}

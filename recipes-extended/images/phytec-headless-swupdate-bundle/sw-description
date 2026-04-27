@@ -1,23 +1,30 @@
 software =
 {
     version = "1.0";
-    
-    # Ensures the update can only be flashed onto this specific board
-    hardware-compatibility = [ "phyboard-pollux-imx8mp-3" ];
+
+    hardware-compatibility = [ "1.0" ];
+
+    scripts: (
+        {
+            filename = "update.sh";
+            type = "shellscript";
+        }
+    );
 
     images: (
         {
-            # Yocto automatically appends the machine name to deployed artifacts
             filename = "phytec-headless-image-phyboard-pollux-imx8mp-3.rootfs.ext4";
-            
-            # The destination block device on the eMMC
-            # (Change this to mmcblk2p3 if flashing to a 'B' partition)
-            device = "/dev/mmcblk2p2"; 
-            
+            device = "/dev/update_root";
             type = "raw";
-            
-            # The Yocto macro that automatically calculates the hash during bitbake
-            sha256 = "$swupdate_get_sha256(phytec-headless-image-phyboard-pollux-imx8mp-3.rootfs.ext4)";
+        }
+    );
+
+    files: (
+        {
+            filename = "fitImage";
+            device = "/dev/update_boot";
+            filesystem = "vfat";
+            path = "/fitImage";
         }
     );
 };
