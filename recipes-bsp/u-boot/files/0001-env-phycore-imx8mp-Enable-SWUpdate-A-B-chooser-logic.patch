@@ -1,0 +1,80 @@
+From 3bcc742adf636e724d99cbe4c10f105fc7417a9d Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 28 Apr 2026 23:59:17 +0000
+Subject: [PATCH] env: phycore-imx8mp: Enable SWUpdate A/B chooser logic
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ board/phytec/phycore_imx8mp/phycore_imx8mp.env | 17 +++++++++++++++--
+ include/env/phytec/fitboot.env                 |  2 +-
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/board/phytec/phycore_imx8mp/phycore_imx8mp.env b/board/phytec/phycore_imx8mp/phycore_imx8mp.env
+index fd1bd95a60e..9ad85138007 100644
+--- a/board/phytec/phycore_imx8mp/phycore_imx8mp.env
++++ b/board/phytec/phycore_imx8mp/phycore_imx8mp.env
+@@ -3,6 +3,7 @@
+ #include <env/phytec/fitboot.env>
+ 
+ bootcmd=
++	run check_saveenv;
+ 	if test ${dofastboot} = 1; then
+ 		fastboot 0;
+ 	fi;
+@@ -35,6 +36,17 @@ legacyboot=
+ 			run netboot;
+ 		fi;
+ 	fi;
++set_mmcroot=
++	if test ${mmcpart} = 1; then
++		setenv mmcroot 5;
++	elif test ${mmcpart} = 2; then
++		setenv mmcroot 6;
++	fi;
++check_saveenv=
++	if test -z "${env_persisted}"; then
++		setenv env_persisted 1;
++		saveenv;
++	fi
+ doefiboot=1
+ bootmeths=script
+ boot_targets=mmc2 mmc1 ethernet
+@@ -42,7 +54,7 @@ boot_script_dhcp=boot.scr.uimg
+ bootenv_addr_r=0x49100000
+ console=ttymxc0,115200
+ dofastboot=0
+-dolegacyboot=0
++dolegacyboot=1
+ emmc_dev=2
+ fastboot_raw_partition_all=0 4194304
+ fastboot_raw_partition_bootloader=64 8128
+@@ -50,7 +62,7 @@ fdt_addr_r=0x48000000
+ fdtfile=CONFIG_DEFAULT_FDT_FILE
+ fit_fdtconf=conf-imx8mp-phyboard-pollux-rdk.dtb
+ fdtoverlay_addr_r=0x49000000
+-image=Image
++image=fitImage
+ ipaddr=192.168.3.11
+ serverip=192.168.3.10
+ netmask=255.225.255.0
+@@ -76,6 +88,7 @@ mmc_apply_extensions=
+ 	fi;
+ mmcboot=
+ 	echo Booting from mmc ...;
++	run set_mmcroot;
+ 	if test ${no_bootenv} = 0; then
+ 		if run mmc_load_bootenv; then
+ 			if test ${dofitboot} = 1; then
+diff --git a/include/env/phytec/fitboot.env b/include/env/phytec/fitboot.env
+index 22a5b32102f..7527afd95f8 100644
+--- a/include/env/phytec/fitboot.env
++++ b/include/env/phytec/fitboot.env
+@@ -1,4 +1,4 @@
+-dofitboot=0
++dofitboot=1
+ fit_test_and_run_boot=
+ 	if test ${dofitboot} = 1; then
+ 		if test ${no_extensions} = 0; then
+-- 
+2.34.1
+
