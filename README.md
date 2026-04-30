@@ -62,7 +62,7 @@ Swupdate, by default, configures a webserver that can also facilitate updates.
 
 With your phyCORE-i.Mx8M Plus Dvelopment Kit connected to the same LAN as your host, use a web browser on your host to access the following URL:
 
-http://<target ip address>:8080/
+http://\<target ip address\>:8080/
 
 To find your phyCORE-i.MX8MPlus Dev Kit's IP address, use the following:
 
