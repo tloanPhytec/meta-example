@@ -1,0 +1,130 @@
+From c2e0679dacec58917df94ea01b5e249dfcb99be4 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 28 Apr 2026 17:31:26 +0000
+Subject: [PATCH] Fix: Change SPI0 reference dtbo to MCU_SPI1
+
+- U46 on the Development Kit Carrier Board Prevents SPI0 from operating properly
+- Instead of spinning the board to resolve this, dev kit evaluators should use MCU_SPI1 instead
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ arch/arm64/boot/dts/ti/Makefile               |  6 +--
+ ...k3-am6754-phyboard-rigel-x37-mcu-spi1.dtso | 36 ++++++++++++++++++
+ .../ti/k3-am6754-phyboard-rigel-x37-spi0.dtso | 38 -------------------
+ 3 files changed, 39 insertions(+), 41 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-mcu-spi1.dtso
+ delete mode 100644 arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-spi0.dtso
+
+diff --git a/arch/arm64/boot/dts/ti/Makefile b/arch/arm64/boot/dts/ti/Makefile
+index 2979bd4ae4b3..f38cfb805aaa 100644
+--- a/arch/arm64/boot/dts/ti/Makefile
++++ b/arch/arm64/boot/dts/ti/Makefile
+@@ -274,7 +274,7 @@ dtb-$(CONFIG_ARCH_K3) += k3-am6754-phyboard-rigel-vm016-mipi-csi0.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-am6754-phyboard-rigel-vm016-mipi-csi1.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-am6754-phyboard-rigel-vm016-mipi-csi2.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-am6754-phyboard-rigel-vm016-mipi-csi3.dtbo
+-dtb-$(CONFIG_ARCH_K3) += k3-am6754-phyboard-rigel-x37-spi0.dtbo
++dtb-$(CONFIG_ARCH_K3) += k3-am6754-phyboard-rigel-x37-mcu-spi1.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-csi2-quad-rpi-cam-imx219.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-j722s-evm-csi2-quad-tevi-ov5640.dtbo
+@@ -454,8 +454,8 @@ k3-am6754-phyboard-rigel-vm016-mipi-csi2-dtbs := k3-am6754-phyboard-rigel.dtb \
+ 	k3-am6754-phyboard-rigel-vm016-mipi-csi2.dtbo
+ k3-am6754-phyboard-rigel-vm016-mipi-csi3-dtbs := k3-am6754-phyboard-rigel.dtb \
+ 	k3-am6754-phyboard-rigel-vm016-mipi-csi3.dtbo
+-k3-am6754-phyboard-rigel-x37-spi0-dtbs := k3-am6754-phyboard-rigel.dtb \
+-	k3-am6754-phyboard-rigel-x37-spi0.dtbo
++k3-am6754-phyboard-rigel-x37-mcu-spi1-dtbs := k3-am6754-phyboard-rigel.dtb \
++	k3-am6754-phyboard-rigel-x37-mcu-spi1.dtbo
+ k3-am68-sk-base-board-csi2-dual-imx219-dtbs := k3-am68-sk-base-board.dtb \
+ 	k3-j721e-sk-csi2-dual-imx219.dtbo
+ k3-am68-sk-base-board-pcie1-ep-dtbs := k3-am68-sk-base-board.dtb \
+diff --git a/arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-mcu-spi1.dtso b/arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-mcu-spi1.dtso
+new file mode 100644
+index 000000000000..c5337432dae9
+--- /dev/null
++++ b/arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-mcu-spi1.dtso
+@@ -0,0 +1,36 @@
++// SPDX-License-Identifier: GPL-2.0-only OR MIT
++/*
++ * Copyright (C) 2025 PHYTEC America LLC
++ * Author: True Loan <tloan@phytec.com>
++ */
++
++/dts-v1/;
++/plugin/;
++
++#include "k3-pinctrl.h"
++
++&mcu_pmx0 {
++	mcu_spi1_pins_default: main-spi0-pins-default {
++		pinctrl-single,pins = <
++			J722S_MCU_IOPAD(0x01c, PIN_INPUT, 3)       /* (B5) MCU_UART0_CTSn.MCU_SPI1_D0 */
++			J722S_MCU_IOPAD(0x020, PIN_INPUT, 3)       /* (C5) MCU_UART0_RTSn.MCU_SPI1_D1 */
++			J722S_MCU_IOPAD(0x02c, PIN_INPUT, 3)       /* (C4) WKUP_UART0_CTSn.MCU_SPI1_CS0 */
++			J722S_MCU_IOPAD(0x030, PIN_INPUT, 3)       /* (C3) WKUP_UART0_RTSn.MCU_SPI1_CLK */
++		>;
++	};
++};
++
++&mcu_spi1 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mcu_spi1_pins_default>;
++
++	spidev@0 {
++		spi-max-frequency = <500000>;
++		reg = <0>;
++		compatible = "rohm,dh2228fv";
++	};
++};
+diff --git a/arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-spi0.dtso b/arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-spi0.dtso
+deleted file mode 100644
+index ff800cc97ea0..000000000000
+--- a/arch/arm64/boot/dts/ti/k3-am6754-phyboard-rigel-x37-spi0.dtso
++++ /dev/null
+@@ -1,38 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only OR MIT
+-/*
+- * Copyright (C) 2025 PHYTEC America, LLC
+- * Author: Nathan Morrisson <nmorrisson@phytec.com>
+- */
+-
+-/dts-v1/;
+-/plugin/;
+-
+-#include "k3-pinctrl.h"
+-
+-&main_pmx0 {
+-	main_spi0_pins_default: main-spi0-default-pins {
+-		pinctrl-single,pins = <
+-			J722S_IOPAD(0x01bc, PIN_INPUT, 0)	/* (D20) SPI0_CLK */
+-			J722S_IOPAD(0x01b4, PIN_OUTPUT, 0)	/* (B20) SPI0_CS0 */
+-			J722S_IOPAD(0x01c0, PIN_OUTPUT, 0)	/* (E19) SPI0_D0 */
+-			J722S_IOPAD(0x01c4, PIN_INPUT, 0)	/* (E20) SPI0_D1 */
+-		>;
+-	};
+-};
+-
+-&main_spi0 {
+-	#address-cells = <1>;
+-	#size-cells = <0>;
+-
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_spi0_pins_default>;
+-	ti,pindir-d0-out-d1-in;
+-	status = "okay";
+-
+-	spidev@0 {
+-		reg = <0>;
+-
+-		spi-max-frequency = <24000000>;
+-		compatible = "rohm,dh2228fv";
+-	};
+-};
+-- 
+2.34.1
+
