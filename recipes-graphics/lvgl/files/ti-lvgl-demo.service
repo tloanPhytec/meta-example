@@ -2,8 +2,7 @@
 
 [Unit]
 Description=ti-lvgl-demo service
-Requires=emptty.service
-After=systemd-user-sessions.service emptty.service
+After=systemd-user-sessions.service
 
 
 [Service]
@@ -11,7 +10,7 @@ Type=simple
 Environment=XDG_RUNTIME_DIR=/run/user/1000
 Environment=WAYLAND_DISPLAY=wayland-1
 ExecStartPre=/bin/sh -c 'while [ ! -S /run/user/1000/wayland-1 ]; do sleep 1; done'
-ExecStart=/bin/sh -c '/usr/bin/lvglsim'
+ExecStart=/bin/sh -c '/usr/bin/lvglsim -W 1280 -H 800'
 
 # Fail to start if not controlling the tty.
 StandardOutput=journal
