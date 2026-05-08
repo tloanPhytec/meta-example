@@ -1,0 +1,1 @@
+CXXFLAGS:append = " -include cstdint"

@@ -1,0 +1,21 @@
+# This is a system unit for launching ti-lvgl-demo.
+
+[Unit]
+Description=ti-lvgl-demo service
+Requires=emptty.service
+After=systemd-user-sessions.service emptty.service
+
+
+[Service]
+Type=simple
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=WAYLAND_DISPLAY=wayland-1
+ExecStartPre=/bin/sh -c 'while [ ! -S /run/user/1000/wayland-1 ]; do sleep 1; done'
+ExecStart=/bin/sh -c '/usr/bin/lvglsim'
+
+# Fail to start if not controlling the tty.
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target multi-user.target
