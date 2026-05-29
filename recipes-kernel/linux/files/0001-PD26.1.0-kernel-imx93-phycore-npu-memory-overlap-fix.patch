@@ -1,0 +1,28 @@
+From f2b9fc74f16560ea6f9cad16926b04296bb7d75e Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Fri, 29 May 2026 18:51:54 +0000
+Subject: [PATCH] PD26.1.0: kernel: imx93-phycore-npu: memory overlap fix
+
+Upstream-Status: Pending
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ arch/arm64/boot/dts/freescale/imx93-phycore-npu.dtso | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx93-phycore-npu.dtso b/arch/arm64/boot/dts/freescale/imx93-phycore-npu.dtso
+index ea578ab2b..b123c2b0a 100644
+--- a/arch/arm64/boot/dts/freescale/imx93-phycore-npu.dtso
++++ b/arch/arm64/boot/dts/freescale/imx93-phycore-npu.dtso
+@@ -21,7 +21,7 @@ reserved-memory {
+ 
+ 		ethosu_mem: ethosu_region@88000000 {
+ 			compatible = "shared-dma-pool";
+-			reg = <0x0 0x88000000 0x0 0x8000000>;
++			reg = <0x0 0xC0000000 0x0 0x10000000>;
+ 			reusable;
+ 		};
+ 	};
+-- 
+2.34.1
+
