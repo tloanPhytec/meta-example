@@ -1,23 +1,23 @@
 # Branch am62-scarthgap-gpioIRQ
 
-This branch serves demonstrates how to handle hardware GPIO interrupts within Linux user-space on the PHYTEC phyCORE-AM62x SOM. It includes a custom C application utilizing libgpiod and poll() to efficiently sleep the userspace application until a physical button press triggers a hardware interrupt, which wakes the application to toggle an external LED.
+This branch serves to demonstrate how to handle hardware GPIO interrupts within Linux user-space on the PHYTEC phyCORE-AM62x SOM. It includes a custom C application utilizing libgpiod and poll() to efficiently sleep the userspace application until a physical button press triggers a hardware interrupt, which wakes the application to toggle an external LED.
 
 In order to evaluate this example, you'll need the following:
 
-* An LED and Series resistor connected to GPIO0_36 and GND (these can be accessed at pin 18 and pin 6 of the X17 Expansion Connector, respectively).
+* An LED and series resistor connected to GPIO0_36 and GND (these can be accessed at pin 18 and pin 6 of the X17 Expansion Connector, respectively).
   * Alternatively, you could rework the example to leverage the LEDs on the SOM. Feel free to reach out to PHYTEC's Support for some pointers. 
 
 This was tested with BSP-Yocto-Ampliphy-AM62x-PD25.1.1
 
 # BSP integration:
 
-Navigate to your BSP's sources directory: 
+Navigate to your BSP's sources directory:
 
 ```sh
 cd $BUILDDIR/../sources
 ```
 
-Clone this repo and branch: 
+Clone this repo and branch:
 
 ```sh
 git clone https://github.com/tloanPhytec/meta-example.git -b am62-scarthgap-gpioIRQ
@@ -28,6 +28,18 @@ Enable the layer in your build:
 ```sh
 cd $BUILDDIR
 bitbake-layers add-layer ../sources/meta-example
+```
+
+Open $BUILDDIR/conf/local.conf:
+
+```sh
+vi $BUILDDIR/conf/local.conf
+```
+
+Enable the new irq-blink recipe in your image by adding the following line to the file:
+
+```sh
+IMAGE_INSTALL:append = " irq-blink"
 ```
 
 Rebuild your target's image:
