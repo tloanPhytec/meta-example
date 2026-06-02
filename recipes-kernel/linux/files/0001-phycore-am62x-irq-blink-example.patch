@@ -1,0 +1,53 @@
+From a2036836a78b3f704d91cc10bc894525c9adf2ef Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Tue, 2 Jun 2026 20:26:24 +0000
+Subject: [PATCH] phycore-am62x: irq-blink example
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ .../boot/dts/ti/k3-am62x-phyboard-lyra.dtsi    | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am62x-phyboard-lyra.dtsi b/arch/arm64/boot/dts/ti/k3-am62x-phyboard-lyra.dtsi
+index aab74d6019b0..45bb44884e80 100644
+--- a/arch/arm64/boot/dts/ti/k3-am62x-phyboard-lyra.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-am62x-phyboard-lyra.dtsi
+@@ -43,13 +43,6 @@ keys {
+ 		compatible = "gpio-keys";
+ 		autorepeat;
+ 		pinctrl-names = "default";
+-		pinctrl-0 = <&gpio_keys_pins_default>;
+-
+-		key-home {
+-			label = "home";
+-			linux,code = <KEY_HOME>;
+-			gpios = <&main_gpio1 23 GPIO_ACTIVE_HIGH>;
+-		};
+ 
+ 		key-menu {
+ 			label = "menu";
+@@ -164,6 +157,12 @@ AM62X_IOPAD(0x1d4, PIN_INPUT, 7) /* (B15) UART0_RTSn.GPIO1_23 */
+ 		>;
+ 	};
+ 
++	blink_led_pins_default: blink-led-pins-default {
++                pinctrl-single,pins = <
++                        AM62X_IOPAD(0x0094, PIN_OUTPUT, 7)
++                >;
++        };
++
+ 	gpio_exp_int_pins_default: gpio-exp-int-default-pins {
+ 		pinctrl-single,pins = <
+ 			AM62X_IOPAD(0x244, PIN_INPUT, 7) /* (C17) MMC1_SDWP.GPIO1_49 */
+@@ -504,3 +503,8 @@ &usb1 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&main_usb1_pins_default>;
+ };
++
++&main_gpio1 {
++        pinctrl-names = "default";
++        pinctrl-0 = <&gpio_keys_pins_default>, <&blink_led_pins_default>;
++};
+-- 
+2.34.1
+
