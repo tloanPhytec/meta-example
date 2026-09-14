@@ -2,6 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append:phyboard-electra= " \
     file://0001-electra-redundant-bootloader-support-added.patch \
+    file://0002-electra-add-print-of-eMMC-boot-part-used-during-boot.patch \
 "
 
 # build SPI NOR-specific bootloader binaries

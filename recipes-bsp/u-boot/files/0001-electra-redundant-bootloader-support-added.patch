@@ -1,7 +1,7 @@
-From 9f23bb3b2a28d3cc5c869bea85fc64b919214e1e Mon Sep 17 00:00:00 2001
+From 4ba6222e72e96e4303b299d32b7a8ee1e95b36e4 Mon Sep 17 00:00:00 2001
 From: tloan <tloan@phytec.com>
 Date: Tue, 8 Sep 2026 23:39:52 +0000
-Subject: [PATCH] electra: redundant bootloader support added
+Subject: [PATCH 1/2] electra: redundant bootloader support added
 
 - boot order customized such that all stages look to SPI NOR in case the next bootloader stage is not valid.
 - a SPI NOR-specific bootloader defconfig has been added where the custom boot env facilitates A/B bootloader switching.
@@ -42,7 +42,7 @@ index 00000000000..31bdb2addf6
 +emmc_boot_part=1
 diff --git a/configs/phycore_am64x_a53_spi_defconfig b/configs/phycore_am64x_a53_spi_defconfig
 new file mode 100644
-index 00000000000..96ced321e88
+index 00000000000..dbf461b58e1
 --- /dev/null
 +++ b/configs/phycore_am64x_a53_spi_defconfig
 @@ -0,0 +1,193 @@
