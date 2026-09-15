@@ -121,15 +121,15 @@ Trying to boot from MMC1
  -> Accessing eMMC boot0 partition                                                        # <= eMMC boot0 used
  ```
 
-We can manually set which eMMC boot partition is used on the subsequent boot using the following commands in Linux userspace:
-
-```sh
-# enable eMMC boot0
-mmc bootpart enable 1 1 /dev/mmcblk0
-
-# enable eMMC boot1
-mmc bootpart enable 2 1 /dev/mmcblk0
-```
+> [!TIP]
+> We can manually set which eMMC boot partition is used on the subsequent boot using the following commands in Linux userspace:
+> ```sh
+> # enable eMMC boot0
+> mmc bootpart enable 1 1 /dev/mmcblk0
+> 
+> # enable eMMC boot1
+> mmc bootpart enable 2 1 /dev/mmcblk0
+> ```
 
 ## Simulate Failed Updates, Exercise Recovery
 
