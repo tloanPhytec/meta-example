@@ -58,9 +58,9 @@ sudo bmaptool copy phytec-headless-image-phyboard-electra-am64xx-2.rootfs.wic.xz
 Once the SD Card is flashed, expand the SD Card's root filesystem:
 
 ```sh
-sudo parted /dev/sde resizepart 2 100%
-sudo e2fsck -f /dev/sde2
-sudo resize2fs /dev/sde2
+sudo parted /dev/sdX resizepart 2 100%
+sudo e2fsck -f /dev/sdX2
+sudo resize2fs /dev/sdX2
 ```
 
 Mount the root filesystem. The easiest way to do this is to just click the root partition of the connected SD Card in your system tray:
