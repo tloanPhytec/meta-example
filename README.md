@@ -1,5 +1,7 @@
 # Meta-Example Branch am64-scarthgap-AB-Bootloaders
 
+[![Platforms](https://img.shields.io/badge/Platform-phyCORE--AM64x-teal)](https://www.phytec.com/product/phycore-am64x/)
+
 This branch serves as a reference for configuring redundant A/B Bootloaders on the eMMC hardware boot partitions of the phyCORE-AM64x SOM in order to facilitate software updates of the bootloader with failure recovery. Auto-switching between the eMMC's boot0/boot1 in case of boot failure is not currently supported in the AM64x boot ROM, it only supports falling back to a different boot interface entirely (eMMC fails -> try SPI NOR, for example). Thus, this reference implementation will make use of a recovery bootloader on the SPI NOR Flash that manages which of the eMMC boot partitions is used for boot, and handles the switch on failure.
 
 Inspiration for this implementation was taken from here:
