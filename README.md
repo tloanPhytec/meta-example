@@ -55,10 +55,11 @@ and that password that you set. Accept the device's self-signed certificate when
 Weston uses its existing `/etc/pam.d/weston-remote-access` policy; this layer
 does not embed a password or replace that policy.
 
-## Verify on the target
+<img width="1920" height="1079" alt="tigerVNC" src="https://github.com/user-attachments/assets/35eaa89c-dfab-48d7-81cd-b5a177e2419f" />
+
+## Service Verification on the target
 
 ```sh
 systemctl status weston-vnc-certificate weston qtphy
 journalctl -u weston-vnc-certificate -u weston -b
-ss -ltn | grep ':5901'
 ```
