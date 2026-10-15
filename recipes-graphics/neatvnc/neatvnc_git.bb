@@ -15,6 +15,7 @@ S = "${WORKDIR}/git"
 DEPENDS = "libdrm pixman aml zlib"
 
 PACKAGECONFIG ??= ""
+PACKAGECONFIG:append:phyboard-pollux-imx8mp-3 = " tls"
 PACKAGECONFIG[tls] = "-Dtls=enabled,-Dtls=disabled,gnutls"
 PACKAGECONFIG[jpeg] = "-Djpeg=enabled,-Djpeg=disabled,libjpeg-turbo"
 PACKAGECONFIG[examples] = "-Dexamples=true,-Dexamples=false,libpng"

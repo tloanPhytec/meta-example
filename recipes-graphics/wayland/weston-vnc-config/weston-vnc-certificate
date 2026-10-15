@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+certdir="@SYSCONFDIR@/weston"
+install -d -m 0750 -o root -g weston "$certdir"
+
+# Keep the device's identity across service restarts and reboots.
+if [ ! -s "$certdir/vnc.key" ] || [ ! -s "$certdir/vnc.crt" ]; then
+	umask 077
+	tmpdir=$(mktemp -d "$certdir/.vnc-XXXXXX")
+	trap 'rm -rf "$tmpdir"' EXIT
+	trap 'exit 1' HUP INT TERM
+	openssl req -x509 -newkey rsa:2048 -nodes \
+		-keyout "$tmpdir/vnc.key" \
+		-out "$tmpdir/vnc.crt" \
+		-days 365 -subj /CN=phyboard-vnc
+	chown root:weston "$tmpdir/vnc.key" "$tmpdir/vnc.crt"
+	chmod 0640 "$tmpdir/vnc.key" "$tmpdir/vnc.crt"
+	mv "$tmpdir/vnc.key" "$certdir/vnc.key"
+	mv "$tmpdir/vnc.crt" "$certdir/vnc.crt"
+fi
+
+chown root:weston "$certdir/vnc.key" "$certdir/vnc.crt"
+chmod 0640 "$certdir/vnc.key" "$certdir/vnc.crt"
