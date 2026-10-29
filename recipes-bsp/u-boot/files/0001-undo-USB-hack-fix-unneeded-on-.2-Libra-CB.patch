@@ -1,0 +1,26 @@
+From 8311c68b527ddfe12230fe9b19fba8276fd58a27 Mon Sep 17 00:00:00 2001
+From: tloan <tloan@phytec.com>
+Date: Thu, 29 Oct 2026 23:07:12 +0000
+Subject: [PATCH] undo USB hack-fix, unneeded on .2 Libra CB
+
+Signed-off-by: tloan <tloan@phytec.com>
+---
+ board/phytec/phycore_am62lx/phycore-am62lx.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/board/phytec/phycore_am62lx/phycore-am62lx.c b/board/phytec/phycore_am62lx/phycore-am62lx.c
+index 395eea03306..4234769138c 100644
+--- a/board/phytec/phycore_am62lx/phycore-am62lx.c
++++ b/board/phytec/phycore_am62lx/phycore-am62lx.c
+@@ -51,8 +51,6 @@ void tusb8042a_swap_lines(void)
+ 
+ int board_init(void)
+ {
+-	tusb8042a_swap_lines();
+-
+ 	return 0;
+ }
+ 
+-- 
+2.34.1
+
